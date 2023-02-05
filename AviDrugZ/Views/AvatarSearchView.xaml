@@ -1,0 +1,53 @@
+﻿<Window x:Class="AviDrugZ.Views.AvatarSearchView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AviDrugZ.Views"
+        xmlns:viewmodels="clr-namespace:AviDrugZ.ViewModels" 
+        d:DataContext="{d:DesignInstance Type=viewmodels:SearchViewModel}"
+        mc:Ignorable="d"
+        Title="AvatarSearchView" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"/>
+
+        <Grid Grid.Row="0" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox Grid.Column="0" ItemsSource="{Binding SearchTypes}" SelectedItem="{Binding SelectedSearchType}"/>
+            <Button Grid.Column="1" Content="Search" Click="Button_Click"/>
+        </Grid>
+        
+        <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="20" IsIndeterminate="{Binding Loading}"></ProgressBar>
+
+        <DataGrid Grid.Row="2" Grid.Column="0" AutoGenerateColumns="False" Grid.ColumnSpan="2" ItemsSource="{Binding AvatarModelsList}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="Image" Width="2*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Height="150" Source="{Binding AviImage}"  />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Name" Width="2*" FontSize="20" Binding="{Binding AvatarName}"/>
+                <DataGridTextColumn Header="Description" Width="2*" FontSize="20" Binding="{Binding Description}"/>
+                <DataGridTextColumn Header="Author Name" Width="1*" FontSize="20" Binding="{Binding AuthorName}"/>
+                <DataGridTextColumn Header="Version" Width="1*" FontSize="20" Binding="{Binding Version}"/>
+                <DataGridTextColumn Header="Id" Width="1*" FontSize="20" Binding="{Binding AvatarID}"/>
+                <DataGridCheckBoxColumn Header="Quest" Width="1*"  Binding="{Binding QuestSupported}"/>
+                <DataGridCheckBoxColumn Header="Private" Width="1*" Binding="{Binding IsPrivate}"/>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
