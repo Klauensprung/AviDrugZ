@@ -15,8 +15,9 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"/>
 
@@ -31,7 +32,7 @@
         
         <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="20" IsIndeterminate="{Binding Loading}"></ProgressBar>
 
-        <DataGrid Grid.Row="2" Grid.Column="0" AutoGenerateColumns="False" Grid.ColumnSpan="2" ItemsSource="{Binding AvatarModelsList}">
+        <DataGrid Grid.Row="2" CanUserAddRows="False" SelectedItem="{Binding SelectedAvatar}" Grid.Column="0" AutoGenerateColumns="False" Grid.ColumnSpan="2" ItemsSource="{Binding AvatarModelsList}">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Image" Width="2*">
                     <DataGridTemplateColumn.CellTemplate>
@@ -40,14 +41,30 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Name" Width="2*" FontSize="20" Binding="{Binding AvatarName}"/>
-                <DataGridTextColumn Header="Description" Width="2*" FontSize="20" Binding="{Binding Description}"/>
-                <DataGridTextColumn Header="Author Name" Width="1*" FontSize="20" Binding="{Binding AuthorName}"/>
-                <DataGridTextColumn Header="Version" Width="1*" FontSize="20" Binding="{Binding Version}"/>
-                <DataGridTextColumn Header="Id" Width="1*" FontSize="20" Binding="{Binding AvatarID}"/>
+
+                <DataGridTemplateColumn Header="Details" Width="3*">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontSize="15" Text="{Binding AvatarName}"/>
+                                <TextBlock FontSize="15" Text="{Binding Description}"/>
+                                <TextBlock FontSize="15" Text="{Binding AuthorName}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="Version" Width="1*" FontSize="15" Binding="{Binding Version}"/>
+                <DataGridTextColumn Header="Id" Width="1*" FontSize="15" Binding="{Binding AvatarID}"/>
+                <DataGridTextColumn Header="Date" Width="1*" FontSize="15" Binding="{Binding DateAdded,StringFormat=d}"/>
                 <DataGridCheckBoxColumn Header="Quest" Width="1*"  Binding="{Binding QuestSupported}"/>
                 <DataGridCheckBoxColumn Header="Private" Width="1*" Binding="{Binding IsPrivate}"/>
             </DataGrid.Columns>
         </DataGrid>
+
+        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
+        <Image Source="{Binding SelectedAvatar.AviImage}"/>
+        <Label Content="{Binding SelectedAvatar.AvatarName}"/>
+        <Label Content="{Binding SelectedAvatar.Description}"/>
+        </StackPanel>
     </Grid>
 </Window>

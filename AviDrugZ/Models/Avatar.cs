@@ -40,6 +40,53 @@ namespace AviDrugZ.Models
             }
         }
 
+        private DateTime ?_dateChecked;
+        public DateTime ?DateChecked
+        {
+            get { return _dateChecked; }
+            set
+            {
+                _dateChecked = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime ?_dateAdded;
+        public DateTime ?DateAdded
+        {
+            get { return _dateAdded; }
+            set
+            {
+                _dateAdded = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private BitmapImage? _fullAviImage;
+        public BitmapImage? FullAviImage
+        {
+            get
+            {
+                if (_fullAviImage == null && ImageUrl != "" && ImageUrl != null)
+                {
+                    BitmapImage bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(ImageUrl, UriKind.Absolute);
+                    bitmap.EndInit();
+
+                    FullAviImage = bitmap;
+                    OnPropertyChanged();
+                    return _fullAviImage;
+                }
+                else return _fullAviImage;
+            }
+            set
+            {
+                _aviImage = value;
+                OnPropertyChanged();
+            }
+        }
+
         private string _imageUrl;
         public string ImageUrl
         {
@@ -72,28 +119,6 @@ namespace AviDrugZ.Models
             set
             {
                 _private = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private DateTime _downloadedAt;
-        public DateTime DownloadedAt
-        {
-            get { return _downloadedAt; }
-            set
-            {
-                _downloadedAt = value;
-                OnPropertyChanged();
-            }
-        }
-
-        private DateTime _createdAt;
-        public DateTime CreatedAt
-        {
-            get { return _createdAt; }
-            set
-            {
-                _createdAt = value;
                 OnPropertyChanged();
             }
         }

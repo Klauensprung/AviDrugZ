@@ -38,23 +38,7 @@ namespace AviDrugZ
                
                 foreach (AvatarWeb webAvatar in webAvatars)
                 {
-                    AvatarModel avatar = new();
-                    avatar.AvatarName = webAvatar.AvatarName;
-                    avatar.AuthorId = webAvatar.AuthorId;
-                    avatar.AuthorName = webAvatar.AuthorName;
-                    avatar.Description = webAvatar.Description;
-                    avatar.AvatarID = webAvatar.Id;
-                    //  avatar.AssetUrl = webAvatar.AssetUrl;
-
-                    if (webAvatar.ImageUrl != null) avatar.ImageUrl = webAvatar.ImageUrl.ToString();
-                    if (webAvatar.ThumbnailUrl != null) avatar.ThumbnailUrl = webAvatar.ThumbnailUrl.ToString();
-                    //   avatar. = webAvatar.IsPrivate;
-                    avatar.QuestSupported = webAvatar.SupportedPlatforms == 3 ? true : false;
-                    avatar.Version = webAvatar.Version.ToString();
-                    avatar.IsPrivate = webAvatar.IsPrivate == 1 ? true : false;
-                    //   avatar.IsDeleted = webAvatar.IsDeleted;
-                    avatar.Version = webAvatar.UnityVersion;
-                    avatars.Add(avatar);
+                    avatars.Add(parseAvatar(webAvatar));
                 }
             }
             return avatars;
@@ -83,28 +67,33 @@ namespace AviDrugZ
             {
                 foreach (AvatarWeb webAvatar in webAvatars)
                 {
-                    AvatarModel avatar = new();
-                    avatar.AvatarName = webAvatar.AvatarName;
-                    avatar.AuthorId = webAvatar.AuthorId;
-                    avatar.AuthorName = webAvatar.AuthorName;
-                    avatar.Description = webAvatar.Description;
-                    avatar.AvatarID = webAvatar.Id;
-                    //  avatar.AssetUrl = webAvatar.AssetUrl;
-
-                    if (webAvatar.ImageUrl != null) avatar.ImageUrl = webAvatar.ImageUrl.ToString();
-                    if (webAvatar.ThumbnailUrl != null) avatar.ThumbnailUrl = webAvatar.ThumbnailUrl.ToString();
-                    //   avatar. = webAvatar.IsPrivate;
-                    avatar.QuestSupported = webAvatar.SupportedPlatforms == 3 ? true : false;
-                    avatar.Version = webAvatar.Version.ToString();
-                    avatar.IsPrivate = webAvatar.IsPrivate == 1 ? true : false;
-                    //   avatar.IsDeleted = webAvatar.IsDeleted;
-                    avatar.Version = webAvatar.UnityVersion;
-                    avatars.Add(avatar);
+                    avatars.Add(parseAvatar(webAvatar));
                 }
             }
             return avatars;
+        }
 
+        private static AvatarModel parseAvatar(AvatarWeb webAvatar)
+        {
+            AvatarModel avatar = new();
+            avatar.AvatarName = webAvatar.AvatarName;
+            avatar.AuthorId = webAvatar.AuthorId;
+            avatar.AuthorName = webAvatar.AuthorName;
+            avatar.Description = webAvatar.Description;
+            avatar.AvatarID = webAvatar.Id;
+            //  avatar.AssetUrl = webAvatar.AssetUrl;
 
+            if (webAvatar.ImageUrl != null) avatar.ImageUrl = webAvatar.ImageUrl.ToString();
+            if (webAvatar.ThumbnailUrl != null) avatar.ThumbnailUrl = webAvatar.ThumbnailUrl.ToString();
+            //   avatar. = webAvatar.IsPrivate;
+            avatar.QuestSupported = webAvatar.SupportedPlatforms == 3 ? true : false;
+            avatar.Version = webAvatar.Version.ToString();
+            avatar.IsPrivate = webAvatar.IsPrivate == 1 ? true : false;
+            avatar.DateAdded = webAvatar.DateAdded == "" ? DateTime.Now : Convert.ToDateTime(webAvatar.DateAdded);
+            avatar.DateChecked = webAvatar.LastChecked == "" ? DateTime.Now : Convert.ToDateTime(webAvatar.LastChecked);
+            //   avatar.IsDeleted = webAvatar.IsDeleted;
+            avatar.Version = webAvatar.UnityVersion;
+            return avatar;
         }
 
     }

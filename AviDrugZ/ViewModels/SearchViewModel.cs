@@ -73,6 +73,18 @@ namespace AviDrugZ.ViewModels
             }
         }
 
+        private AvatarModel _selectedAvatar;
+
+        public AvatarModel SelectedAvatar
+        {
+            get { return _selectedAvatar; }
+            set
+            {
+                _selectedAvatar = value;
+                OnPropertyChanged();
+            }
+        }
+
         public void SearchForAvatars()
         {
             if (!Loading)
