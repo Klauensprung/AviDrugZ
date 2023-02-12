@@ -16,8 +16,7 @@ namespace AviDrugZ
     {
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-
-            StartupUri = new Uri("Views/AvatarSearchView.xaml", UriKind.Relative);
+             StartupUri = new Uri("Views/LoginView.xaml", UriKind.Relative);
         }
     }
 }

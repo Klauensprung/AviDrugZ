@@ -12,7 +12,13 @@
     <Compile Update="Views\AvatarSearchView.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="Views\FavoritesSelectView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Update="Views\LoginView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="Views\xWindow.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -20,10 +26,19 @@
     <Page Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="UI\DataGridRow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\AvatarSearchView.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="Views\FavoritesSelectView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="Views\LoginView.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\xWindow.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

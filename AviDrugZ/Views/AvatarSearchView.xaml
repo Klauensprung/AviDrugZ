@@ -1,70 +1,227 @@
-﻿<Window x:Class="AviDrugZ.Views.AvatarSearchView"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:AviDrugZ.Views"
-        xmlns:viewmodels="clr-namespace:AviDrugZ.ViewModels" 
-        d:DataContext="{d:DesignInstance Type=viewmodels:SearchViewModel}"
-        mc:Ignorable="d"
-        Title="AvatarSearchView" Height="450" Width="800">
+﻿<ui:UiWindow
+    x:Class="AviDrugZ.Views.AvatarSearchView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Width="800"
+    Height="450"
+    mc:Ignorable="d"
+    Background="{ui:ThemeResource ApplicationBackgroundBrush}"
+    ExtendsContentIntoTitleBar="True"
+    Title="Avatar Search"
+    WindowBackdropType="Mica"
+    WindowCornerPreference="Round"
+    WindowStartupLocation="CenterScreen">
+
     <Grid>
+
+        <!--<Grid.Resources>
+            <DataTemplate x:Key="CardTemplate">
+                <ui:Card>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock FontSize="15" Text="{Binding Text}"/>
+                    </StackPanel>
+                </ui:Card>
+            </DataTemplate>
+        </Grid.Resources>-->
+
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="30" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-            <ColumnDefinition Width="2*"/>
-        </Grid.ColumnDefinitions>
-        <TextBox Grid.Row="0" Grid.Column="0" Text="{Binding SearchText, Mode=TwoWay}"/>
 
-        <Grid Grid.Row="0" Grid.Column="1">
+        <!--  The title bar contains window navigation elements and some Tray related extras.  -->
+        <!--  You can put additional controls in the header, such as a search bar.  -->
+        <!--  <ui:TitleBar.Header />  -->
+        <ui:TitleBar  Padding="15,-15,0,-15" Grid.Row="0" Title="AviDrugZ - Avatar search system">
+            <ui:TitleBar.Tray>
+                <ui:NotifyIcon
+                    FocusOnLeftClick="True"
+                    MenuOnRightClick="True"
+                    TooltipText="WPF UI">
+
+                    <ui:NotifyIcon.Menu>
+                        <ContextMenu>
+                            <ui:MenuItem
+                                Header="Home"
+                                SymbolIcon="Library16"
+                                Tag="home" />
+                        </ContextMenu>
+                    </ui:NotifyIcon.Menu>
+                </ui:NotifyIcon>
+            </ui:TitleBar.Tray>
+        </ui:TitleBar>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
-                <ColumnDefinition Width="2*"/>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <ComboBox Grid.Column="0" ItemsSource="{Binding SearchTypes}" SelectedItem="{Binding SelectedSearchType}"/>
-            <Button Grid.Column="1" Content="Search" Click="Button_Click"/>
+            <ui:TextBox
+                Grid.Row="0"
+                Grid.Column="0"
+                Text="{Binding SearchText, Mode=TwoWay}" />
+
+
+            <Grid Grid.Row="0" Margin="15" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <ComboBox
+                    Margin="0,0,15,0"
+                    Grid.Column="0"
+                    ItemsSource="{Binding SearchTypes}"
+                    SelectedItem="{Binding SelectedSearchType}" />
+                <ui:Button
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Click="Button_Click"
+                    Content="Search"
+                    Icon="Search12" />
+            </Grid>
+
+            <ProgressBar Margin="5"
+                Grid.Row="1"
+                Grid.ColumnSpan="2"
+                Height="20"
+                IsIndeterminate="{Binding Loading}" />
+
+
+            <ui:ProgressRing Grid.Row="2" IsIndeterminate="{Binding Loading}" Visibility="{Binding ShowLoading}"  Grid.Column="0" Grid.ColumnSpan="2"/>
+
+            <ui:DataGrid
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                ItemsSource="{Binding AvatarModelsList}"
+                SelectedItem="{Binding SelectedAvatar}">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="3*" Header="Image">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Height="150" Source="{Binding AviImage}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Width="3*" Header="Details">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:Card>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="15" Text="{Binding AvatarName}" />
+                                        <TextBlock FontSize="15" Text="{Binding Description}" />
+                                        <TextBlock FontSize="15" Text="{Binding AuthorName}" />
+                                    </StackPanel>
+                                </ui:Card>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTextColumn Header="Version" Binding="{Binding Version}">
+                        
+                    </DataGridTextColumn>
+                    
+                    <!--<DataGridTemplateColumn TextSearch.TextPath="{Binding Version}" Width="2*" Header="Version">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:Card>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="15" Text="{Binding Version}" />
+                                    </StackPanel>
+                                </ui:Card>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>-->
+
+                    <DataGridTemplateColumn Width="2*" Header="Date">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:Card>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="15" Text="{Binding DateAdded,StringFormat=d}" />
+                                    </StackPanel>
+                                </ui:Card>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridCheckBoxColumn
+                        Width="1*"
+                        Binding="{Binding QuestSupported}"
+                        Header="Quest" />
+                </DataGrid.Columns>
+            </ui:DataGrid>
+            <GridSplitter
+                Grid.Row="0"
+                Grid.RowSpan="3"
+                Grid.Column="2"
+                Width="5"
+                HorizontalAlignment="Left">
+                <GridSplitter.Background>
+                    <LinearGradientBrush StartPoint="0.5,0" EndPoint="0.5,1">
+                        <GradientStop Offset=".2" Color="Black" />
+                    </LinearGradientBrush>
+                </GridSplitter.Background>
+            </GridSplitter>
+
+            <Grid
+                Grid.RowSpan="3"
+                Grid.Column="3"
+                Margin="15">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="2*"/>
+                    <RowDefinition Height="50"/>
+                </Grid.RowDefinitions>
+
+                <ui:Card Grid.Row="0" Content="{Binding SelectedAvatar.AvatarName}" />
+
+                <Image Grid.Row="1" Source="{Binding SelectedAvatar.AviImage}" />
+                <ui:Card Grid.Row="2">
+                    <StackPanel Orientation="Vertical">
+                        <Label Content="{Binding SelectedAvatar.Description}" />
+                        <Label Content="{Binding SelectedAvatar.Version}" />
+                    </StackPanel>
+                </ui:Card>
+
+                <Grid Grid.Row="3" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ui:Button IsEnabled="{Binding VrcLoggedIn}" Click="Button_Click_2" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ui:SymbolIcon FontSize="25" ToolTip="Favorite Avatar" Symbol="StarAdd28"></ui:SymbolIcon>
+                    </ui:Button>
+                    <ui:Button  Click="SearchAvatar_Click" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ui:SymbolIcon FontSize="25" ToolTip="Search for author" Symbol="Search12"></ui:SymbolIcon>
+                    </ui:Button>
+                    <ui:Button IsEnabled="{Binding VrcLoggedIn}" Click="Button_Click_3" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ui:SymbolIcon FontSize="25" ToolTip="Wear avatar" Symbol="ArrowForwardDownPerson24"></ui:SymbolIcon>
+                    </ui:Button>
+                </Grid>
+            </Grid>
         </Grid>
-        
-        <ProgressBar Grid.Row="1" Grid.ColumnSpan="2" Height="20" IsIndeterminate="{Binding Loading}"></ProgressBar>
 
-        <DataGrid Grid.Row="2" CanUserAddRows="False" SelectedItem="{Binding SelectedAvatar}" Grid.Column="0" AutoGenerateColumns="False" Grid.ColumnSpan="2" ItemsSource="{Binding AvatarModelsList}">
-            <DataGrid.Columns>
-                <DataGridTemplateColumn Header="Image" Width="2*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <Image Height="150" Source="{Binding AviImage}"  />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-
-                <DataGridTemplateColumn Header="Details" Width="3*">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Vertical">
-                                <TextBlock FontSize="15" Text="{Binding AvatarName}"/>
-                                <TextBlock FontSize="15" Text="{Binding Description}"/>
-                                <TextBlock FontSize="15" Text="{Binding AuthorName}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTextColumn Header="Version" Width="1*" FontSize="15" Binding="{Binding Version}"/>
-                <DataGridTextColumn Header="Id" Width="1*" FontSize="15" Binding="{Binding AvatarID}"/>
-                <DataGridTextColumn Header="Date" Width="1*" FontSize="15" Binding="{Binding DateAdded,StringFormat=d}"/>
-                <DataGridCheckBoxColumn Header="Quest" Width="1*"  Binding="{Binding QuestSupported}"/>
-                <DataGridCheckBoxColumn Header="Private" Width="1*" Binding="{Binding IsPrivate}"/>
-            </DataGrid.Columns>
-        </DataGrid>
-
-        <StackPanel Orientation="Vertical" Grid.Row="2" Grid.Column="2">
-        <Image Source="{Binding SelectedAvatar.AviImage}"/>
-        <Label Content="{Binding SelectedAvatar.AvatarName}"/>
-        <Label Content="{Binding SelectedAvatar.Description}"/>
-        </StackPanel>
+        <StatusBar Grid.Row="2" >
+            <StatusBarItem Margin="-10">
+                <TextBlock Text="{Binding AvatarCount}"></TextBlock>
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
-</Window>
+</ui:UiWindow>

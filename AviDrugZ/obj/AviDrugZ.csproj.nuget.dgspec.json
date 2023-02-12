@@ -14,11 +14,13 @@
         "outputPath": "H:\\Git\\AviDrugZ\\AviDrugZ\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "H:\\Neuer Ordner\\Components\\Offline Packages"
+          "H:\\Neuer Ordner\\Components\\Offline Packages",
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
           "C:\\Users\\Sebas\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\DevExpress 22.1.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -26,6 +28,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Program Files\\dotnet\\library-packs": {},
           "H:\\Neuer Ordner\\Components\\System\\Components\\Packages": {},
           "https://api.nuget.org/v3/index.json": {}
         },
@@ -48,6 +51,10 @@
             "VRChat.API": {
               "target": "Package",
               "version": "[1.9.1, )"
+            },
+            "WPF-UI": {
+              "target": "Package",
+              "version": "[2.0.3, )"
             },
             "log4net": {
               "target": "Package",

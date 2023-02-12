@@ -1,0 +1,61 @@
+﻿<Window x:Class="AviDrugZ.Views.FavoritesSelectView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    Width="250"
+    Height="400"
+    mc:Ignorable="d"
+    Background="{ui:ThemeResource ApplicationBackgroundBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="4*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <!--  The title bar contains window navigation elements and some Tray related extras.  -->
+        <!--  You can put additional controls in the header, such as a search bar.  -->
+        <!--  <ui:TitleBar.Header />  -->
+        <ui:TitleBar Grid.Row="0" Title="Select Favorite Group">
+            <ui:TitleBar.Tray>
+                <ui:NotifyIcon
+                    FocusOnLeftClick="True"
+                    MenuOnRightClick="True"
+                    TooltipText="WPF UI">
+
+                    <ui:NotifyIcon.Menu>
+                        <ContextMenu>
+                            <ui:MenuItem
+                                Header="Home"
+                                SymbolIcon="Library16"
+                                Tag="home" />
+                        </ContextMenu>
+                    </ui:NotifyIcon.Menu>
+                </ui:NotifyIcon>
+            </ui:TitleBar.Tray>
+        </ui:TitleBar>
+
+        <StackPanel  Grid.Row="1" Margin="15" Orientation="Vertical">
+            <RadioButton GroupName="AvatarList" IsChecked="True" FontSize="20" Content="avatars1" />
+            <Border Height="10"></Border>
+            <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click" Content="avatars2" />
+            <Border Height="10"></Border>
+            <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_1" Content="avatars3" />
+            <Border Height="10"></Border>
+            <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_2" Content="avatars4" />
+            <Border Height="10"></Border>
+            <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_3" Content="avatars5" />
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+            <ui:Button Click="Add_Click"  Margin="10" HorizontalAlignment="Stretch" FontSize="25" VerticalAlignment="Stretch" Icon="Add12" ></ui:Button>
+            <ui:Button Click="Close_Click" Margin="10" HorizontalAlignment="Stretch" FontSize="25" VerticalAlignment="Stretch" Grid.Column="1" Icon="PresenceOffline10"></ui:Button>
+        </Grid>
+    </Grid>
+</Window>
