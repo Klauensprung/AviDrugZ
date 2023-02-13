@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 H:\Git\AviDrugZ\AviDrugZ\App.xaml
-3-1402301580
+6106728990
+1779560245
+1741274553
+202-1118941275
+MainWindow.xaml;UI\DataGridRow.xaml;Views\AvatarSearchView.xaml;Views\FavoritesSelectView.xaml;Views\LoginView.xaml;Views\xWindow.xaml;
 
-13-1086541956
-200-445641915
-MainWindow.xaml;Views\AvatarSearchView.xaml;Views\LoginView.xaml;
-
-True
+False
 

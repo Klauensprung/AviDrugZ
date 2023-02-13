@@ -30,3 +30,11 @@ H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\refint\AviDrugZ.dll
 H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\AviDrugZ.pdb
 H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\AviDrugZ.genruntimeconfig.cache
 H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\ref\AviDrugZ.dll
+H:\Git\AviDrugZ\AviDrugZ\bin\x64\Debug\net6.0-windows\Wpf.Ui.dll
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\App.baml
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\Views\xWindow.baml
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\Views\xWindow.g.cs
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\UI\DataGridRow.baml
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\AviDrugZ_Content.g.cs
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\Views\FavoritesSelectView.baml
+H:\Git\AviDrugZ\AviDrugZ\obj\x64\Debug\net6.0-windows\Views\FavoritesSelectView.g.cs

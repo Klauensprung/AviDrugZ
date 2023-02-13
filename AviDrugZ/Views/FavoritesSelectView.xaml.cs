@@ -51,22 +51,32 @@ namespace AviDrugZ.Views
 
         private void RadioButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectedList = "avatars1";
+            SelectedList = "avatars2";
         }
 
         private void RadioButton_Click_1(object sender, RoutedEventArgs e)
         {
-            SelectedList = "avatars2";
+            SelectedList = "avatars3";
         }
 
         private void RadioButton_Click_2(object sender, RoutedEventArgs e)
         {
-            SelectedList = "avatars3";
+            SelectedList = "avatars4";
         }
 
         private void RadioButton_Click_3(object sender, RoutedEventArgs e)
         {
-            SelectedList = "avatars4";
+            SelectedList = "avatars5";
+        }
+
+        private void RadioButton_Click_4(object sender, RoutedEventArgs e)
+        {
+            SelectedList = "avatars6";
+        }
+
+        private void RadioButton_Click_5(object sender, RoutedEventArgs e)
+        {
+            SelectedList = "avatars1";
         }
     }
 }

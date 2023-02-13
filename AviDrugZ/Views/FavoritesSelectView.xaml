@@ -5,7 +5,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
     Width="250"
-    Height="400"
+    Height="450"
     mc:Ignorable="d"
     Background="{ui:ThemeResource ApplicationBackgroundBrush}">
     <Grid>
@@ -38,7 +38,7 @@
         </ui:TitleBar>
 
         <StackPanel  Grid.Row="1" Margin="15" Orientation="Vertical">
-            <RadioButton GroupName="AvatarList" IsChecked="True" FontSize="20" Content="avatars1" />
+            <RadioButton GroupName="AvatarList" IsChecked="True" Click="RadioButton_Click_5" FontSize="20" Content="avatars1" />
             <Border Height="10"></Border>
             <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click" Content="avatars2" />
             <Border Height="10"></Border>
@@ -47,6 +47,8 @@
             <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_2" Content="avatars4" />
             <Border Height="10"></Border>
             <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_3" Content="avatars5" />
+            <Border Height="10"></Border>
+            <RadioButton GroupName="AvatarList" FontSize="20" Click="RadioButton_Click_4" Content="avatars6" />
         </StackPanel>
 
         <Grid Grid.Row="2">

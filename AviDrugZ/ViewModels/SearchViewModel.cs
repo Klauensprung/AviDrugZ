@@ -136,6 +136,12 @@ namespace AviDrugZ.ViewModels
 
         public void FavoriteAvatar()
         {
+            if (SelectedAvatar == null)
+            {
+                MessageBox.Show("Please select an avatar first!");
+                return;
+            }
+            
             List<string> toUpdateOnlineList = new List<string>();
             
 
@@ -172,6 +178,12 @@ namespace AviDrugZ.ViewModels
 
         public void WearAvatar()
         {
+            if (SelectedAvatar == null)
+            {
+                MessageBox.Show("Please select an avatar first!");
+                return;
+            }
+            
             VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
             MessageBox.Show("Sucessfully worn avatar!");
         }
