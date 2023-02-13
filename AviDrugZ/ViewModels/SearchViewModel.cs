@@ -7,8 +7,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using VRChat.API.Model;
 
 namespace AviDrugZ.ViewModels
@@ -28,6 +30,7 @@ namespace AviDrugZ.ViewModels
                 OnPropertyChanged();
             }
         }
+
 
         public string SearchText
         {
@@ -134,6 +137,29 @@ namespace AviDrugZ.ViewModels
             }
         }
 
+
+        public async void CopyClipboard()
+        {
+            if (SelectedAvatar == null)
+            {
+                MessageBox.Show("Please select an avatar first!");
+                return;
+            }
+
+            //Copy avatarID to clipboard
+
+            DataObject data = new DataObject();
+
+            // Add a Customer object using the type as the format.
+            data.SetData(SelectedAvatar.AvatarID.GetType(), SelectedAvatar.AvatarID);
+
+
+            Clipboard.SetDataObject(data);
+            MessageBox.Show("Copied avatar ID to clipboard!");
+        }
+
+        
+
         public void FavoriteAvatar()
         {
             if (SelectedAvatar == null)
@@ -190,6 +216,7 @@ namespace AviDrugZ.ViewModels
 
         public void SearchForAvatars(bool author)
         {
+            
             if (!Loading)
             {
                 Loading = true;
@@ -199,6 +226,7 @@ namespace AviDrugZ.ViewModels
 
                 if (author)
                 {
+                    if (SelectedAvatar == null) { return; }
                     task = WebManager.getAvatarsByAuthor(SelectedAvatar.AuthorName);
                 }
                 else

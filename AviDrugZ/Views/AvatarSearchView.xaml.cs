@@ -61,5 +61,10 @@ namespace AviDrugZ.Views
         {
             ((SearchViewModel)DataContext).WearAvatar();
         }
+
+        private void Button_Click_4(object sender, RoutedEventArgs e)
+        {
+            ((SearchViewModel)DataContext).CopyClipboard();
+        }
     }
 }

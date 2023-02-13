@@ -130,11 +130,11 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTextColumn Header="Version" Binding="{Binding Version}">
+                    <!--<DataGridTextColumn Header="Version" Binding="{Binding Version}">
                         
-                    </DataGridTextColumn>
-                    
-                    <!--<DataGridTemplateColumn TextSearch.TextPath="{Binding Version}" Width="2*" Header="Version">
+                    </DataGridTextColumn>-->
+
+                    <DataGridTemplateColumn TextSearch.TextPath="{Binding Version}" Width="2*" Header="Version">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:Card>
@@ -144,7 +144,7 @@
                                 </ui:Card>
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>-->
+                    </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn Width="2*" Header="Date">
                         <DataGridTemplateColumn.CellTemplate>
@@ -183,15 +183,28 @@
                 Margin="15">
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="2*"/>
-                    <RowDefinition Height="4*"/>
+                    <RowDefinition Height="75"/>
+                    <RowDefinition Height="6*"/>
                     <RowDefinition Height="2*"/>
                     <RowDefinition Height="50"/>
                 </Grid.RowDefinitions>
 
-                <ui:Card Grid.Row="0" Content="{Binding SelectedAvatar.AvatarName}" />
+                <ui:Card Padding="-15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        
+                        <Label Grid.Column="0" Padding="15" Content="{Binding SelectedAvatar.AvatarName}" />
+                        <ui:Button Click="Button_Click_4" Grid.Column="1">
+                            <ui:SymbolIcon FontSize="25" ToolTip="Copy AvatarID to Clipboard" Symbol="ClipboardCheckmark24"></ui:SymbolIcon>
+                        </ui:Button>
+                        <!--<ui:TextBox Text="{Binding SelectedAvatar.AuthorId}" />-->
+                    </Grid>
+                </ui:Card>
 
-                <Image Grid.Row="1" Source="{Binding SelectedAvatar.AviImage}" />
+                    <Image Grid.Row="1" Source="{Binding SelectedAvatar.AviImage}" />
                 <ui:Card Grid.Row="2">
                     <StackPanel Orientation="Vertical">
                         <Label Content="{Binding SelectedAvatar.Description}" />
