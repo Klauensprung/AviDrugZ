@@ -21,7 +21,7 @@ namespace AviDrugZ
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
            
-            string url = "https://klauentec.zapto.org/avatars/avatars.php";
+            string url = "https://avatars.bs002.de/avatars/avatars.php";
             //Urlencode avatarName
             string urlEncodedAvatarName = System.Web.HttpUtility.UrlEncode(avatarName);
             url += "?name=" + urlEncodedAvatarName;
@@ -49,7 +49,7 @@ namespace AviDrugZ
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
 
-            string url = "https://klauentec.zapto.org/avatars/avatars.php";
+            string url = "https://avatars.bs002.de/avatars/avatars.php";
             //Urlencode avatarName
             string urlEncodedAvatarName = System.Web.HttpUtility.UrlEncode(authorName);
             url += "?author=" + urlEncodedAvatarName;
