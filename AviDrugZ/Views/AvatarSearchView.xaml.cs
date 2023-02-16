@@ -71,6 +71,8 @@ namespace AviDrugZ.Views
         {
             if (e.Key == Key.Return)
             {
+                //Why no sync ??
+                ((SearchViewModel)DataContext).SearchText = ((Wpf.Ui.Controls.TextBox)sender).Text;
                 ((SearchViewModel)DataContext).SearchForAvatars(false);
             }
         }
