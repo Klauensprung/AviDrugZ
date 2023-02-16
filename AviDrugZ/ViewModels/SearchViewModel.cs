@@ -6,7 +6,9 @@ using AviDrugZ.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -142,7 +144,12 @@ namespace AviDrugZ.ViewModels
 
         public void ScanCache()
         {
-            if(!VrcLoggedIn)
+
+
+            if (MessageBox.Show("Would you like to scan your cache ? This may take a minute or two", "Scan", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
+             
+                
+            if (!VrcLoggedIn)
             {
                 MessageBox.Show("Please login to VRChat first/restart the program");
                 return;
@@ -154,8 +161,12 @@ namespace AviDrugZ.ViewModels
                 CacheScanner scanner = new CacheScanner();
 
                 //Run scanCacheFast Task and continue with 
+                string cacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+                string cachePath = $"{cacheFolder}\\..\\LocalLow\\VRChat\\VRChat\\Cache-WindowsPlayer";
 
-                Task<List<string>> task = Task.Run(()=>scanner.scanCacheFast(-1));
+                //FOLDER BROWSER DIALOG WHERE WPF ?? WHERE ?? WTF IS WRONG WITH THIS FRAMEWORK
+                
+                Task<List<string>> task = Task.Run(()=>scanner.scanCacheFast(-1, cachePath));
 
                 task.ContinueWith((t) =>
                 {

@@ -33,7 +33,7 @@ namespace AviDrugZ.Modules
         static int avatarCount = 0;
         static int worldCount = 0;
 
-        public async Task<List<string>> scanCacheFast(int limit)
+        public async Task<List<string>> scanCacheFast(int limit, string cacheLocation)
         {
             int aviFound = 0;
             List<AvatarModel> avis = new List<AvatarModel>();

@@ -78,6 +78,7 @@ namespace AviDrugZ.Views
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
             //Scan cache
+            
             ((SearchViewModel)DataContext).ScanCache();
         }
     }

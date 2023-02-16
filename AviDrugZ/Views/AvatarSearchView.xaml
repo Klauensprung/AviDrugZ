@@ -80,17 +80,19 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <ComboBox
-                    Margin="0,0,15,0"
+                    Margin="0,0,5,0"
                     Grid.Column="0"
                     ItemsSource="{Binding SearchTypes}"
                     SelectedItem="{Binding SelectedSearchType}" />
                 <ui:Button
+                    Margin="0,0,5,0"
                     Grid.Column="1"
                     HorizontalAlignment="Stretch"
                     Click="Button_Click"
                     Content="Search"
                     Icon="Search12" />
                 <ui:Button
+                    Margin="0,0,5,0"
                     Grid.Column="2"
                     HorizontalAlignment="Stretch"
                     Click="Button_Click_5"
