@@ -17,7 +17,7 @@ namespace AviDrugZ
     {
         public static async Task<ObservableCollection<AvatarModel>> getAvatarsByName(string avatarName)
         {
-            //Make a HttpWebRequest to the API on klauentec.zapto.org/avatars/avatars.php
+            //Make a HttpWebRequest to the API on smokes
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
            
@@ -45,7 +45,7 @@ namespace AviDrugZ
 
         public static async Task<ObservableCollection<AvatarModel>> getAvatarsByAuthor(string authorName)
         {
-            //Make a HttpWebRequest to the API on klauentec.zapto.org/avatars/avatars.php
+            //Make a HttpWebRequest to the API on smokes
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
 

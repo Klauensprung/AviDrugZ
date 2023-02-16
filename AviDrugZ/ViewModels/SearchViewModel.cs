@@ -3,6 +3,7 @@ using AviDrugZ.Models;
 using AviDrugZ.Models.WebModels;
 using AviDrugZ.Modules;
 using AviDrugZ.Views;
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,7 +41,9 @@ namespace AviDrugZ.ViewModels
         public string SearchText
         {
             get { return _searchText; }
-            set { _searchText = value;
+            set
+            {
+                _searchText = value;
                 OnPropertyChanged();
             }
         }
@@ -68,6 +71,7 @@ namespace AviDrugZ.ViewModels
                 OnPropertyChanged();
             }
         }
+
         public enum SearchType
         {
             Name,
@@ -76,6 +80,7 @@ namespace AviDrugZ.ViewModels
 
 
         private SearchType _selectedSearchType = SearchType.Name;
+
         public SearchType SelectedSearchType
         {
             get { return _selectedSearchType; }
@@ -88,13 +93,8 @@ namespace AviDrugZ.ViewModels
 
         public IEnumerable<SearchType> SearchTypes
         {
-            get
-            {
-                return Enum.GetValues(typeof(SearchType))
-                    .Cast<SearchType>();
-            }
+            get { return Enum.GetValues(typeof(SearchType)).Cast<SearchType>(); }
         }
-
 
 
         private bool _loading = false;
@@ -105,12 +105,11 @@ namespace AviDrugZ.ViewModels
             set
             {
                 _loading = value;
-                
-                if (_loading)
+
+                if(_loading)
                 {
                     ShowLoading = Visibility.Visible;
-                }
-                else
+                } else
                 {
                     ShowLoading = Visibility.Hidden;
                 }
@@ -124,7 +123,9 @@ namespace AviDrugZ.ViewModels
         public ObservableCollection<AvatarModel> AvatarModelsList
         {
             get { return _avatarModels; }
-            set { _avatarModels = value;
+            set
+            {
+                _avatarModels = value;
                 AvatarCount = _avatarModels.Count.ToString() + " avatars found";
                 OnPropertyChanged();
             }
@@ -144,115 +145,136 @@ namespace AviDrugZ.ViewModels
 
         public void ScanCache()
         {
+            if(MessageBox.Show(
+                    "Would you like to scan your cache ? This may take a minute or two",
+                    "Scan",
+                    MessageBoxButton.YesNo) ==
+                MessageBoxResult.No)
+                return;
 
 
-            if (MessageBox.Show("Would you like to scan your cache ? This may take a minute or two", "Scan", MessageBoxButton.YesNo) == MessageBoxResult.No) return;
-             
-                
-            if (!VrcLoggedIn)
+            if(!VrcLoggedIn)
             {
                 MessageBox.Show("Please login to VRChat first/restart the program");
                 return;
             }
 
-            if (!Loading)
+            if(!Loading)
             {
                 Loading = true;
                 CacheScanner scanner = new CacheScanner();
 
+
                 //Run scanCacheFast Task and continue with 
-                string cacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-                string cachePath = $"{cacheFolder}\\..\\LocalLow\\VRChat\\VRChat\\Cache-WindowsPlayer";
+                string cacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string cachePath = $"{cacheFolder}Low\\VRChat\\VRChat\\Cache-WindowsPlayer";
+                //Lets not talk about this workaround to find localLow please kthxbye 
+
+                VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog();
+                dialog.Description = "Select your VrChat Cache folder called Cache-WindowsPlayer";
+
+                if (Directory.Exists(cachePath))
+                {
+                    dialog.SelectedPath = cachePath;
+                }
+
+                if (!dialog.ShowDialog().Value)
+                {
+                    Loading = false;
+                    return;
+                }
+                cachePath = dialog.SelectedPath;
+
+                //    cachePath = dialog.SelectedPath;
 
                 //FOLDER BROWSER DIALOG WHERE WPF ?? WHERE ?? WTF IS WRONG WITH THIS FRAMEWORK
-                
-                Task<List<string>> task = Task.Run(()=>scanner.scanCacheFast(-1, cachePath));
 
-                task.ContinueWith((t) =>
-                {
-                    List<AvatarWeb> webModels = new List<AvatarWeb>();
-                    ObservableCollection<AvatarModel> avatarModels = new ObservableCollection<AvatarModel>();
-                    foreach (string item in task.Result)
+                Task<List<string>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath));
+
+                task.ContinueWith(
+                    (t) =>
                     {
-                        try
+                        List<AvatarWeb> webModels = new List<AvatarWeb>();
+                        ObservableCollection<AvatarModel> avatarModels = new ObservableCollection<AvatarModel>();
+                        foreach(string item in task.Result)
                         {
-                            Avatar a = VRCApiController.instance.AvatarApi.GetAvatar(item);
-                            AvatarModel model = new AvatarModel();
-                            AvatarWeb webmodel = new AvatarWeb();
-                            
-                            model.AvatarID = a.Id;
-                            model.AvatarName = a.Name;
-                            model.AuthorName = a.AuthorName;
-                            model.AuthorId = a.AuthorId;
-                            model.DateAdded = a.CreatedAt;
-                            model.Description = a.Description;
-                            model.ThumbnailUrl = a.ThumbnailImageUrl;
-                            model.ImageUrl = a.ImageUrl;
-                            model.Version = a.UnityPackages[0].UnityVersion;
-                            model.DateChecked = DateTime.Today;
-
-                            webmodel.AuthorId = a.AuthorId;
-                            webmodel.AuthorName = a.AuthorName;
-                            webmodel.AvatarName = a.Name;
-                            webmodel.AssetUrl = "idk";
-                            webmodel.SupportedPlatforms = 1;
-                            webmodel.IsPrivate = 0;
-                            webmodel.DateAdded = DateTime.Today.ToString();
-                            webmodel.LastChecked = DateTime.Today.ToString();
-                            webmodel.Description = a.Description;
-
-                            string latestVersion = "";
-
-                            foreach (UnityPackage package in a.UnityPackages)
+                            try
                             {
-                                if (package.UnityVersion.CompareTo(latestVersion) > 0)
-                                {
-                                    latestVersion = package.UnityVersion;
-                                }
+                                Avatar a = VRCApiController.instance.AvatarApi.GetAvatar(item);
+                                AvatarModel model = new AvatarModel();
+                                AvatarWeb webmodel = new AvatarWeb();
 
-                                if (package.Platform == "android")
+                                model.AvatarID = a.Id;
+                                model.AvatarName = a.Name;
+                                model.AuthorName = a.AuthorName;
+                                model.AuthorId = a.AuthorId;
+                                model.DateAdded = a.CreatedAt;
+                                model.Description = a.Description;
+                                model.ThumbnailUrl = a.ThumbnailImageUrl;
+                                model.ImageUrl = a.ImageUrl;
+                                model.Version = a.UnityPackages[0].UnityVersion;
+                                model.DateChecked = DateTime.Today;
+
+                                webmodel.Id = a.Id;
+                                webmodel.AvatarName = a.Name;
+                                webmodel.AuthorName = a.AuthorName;
+                                webmodel.AuthorId = a.AuthorId;
+                                webmodel.DateAdded = DateTime.Today.ToString();
+                                webmodel.Description = a.Description;
+                                webmodel.ThumbnailUrl = a.ThumbnailImageUrl;
+                                webmodel.ImageUrl = a.ImageUrl;
+                                webmodel.AssetUrl = a.AssetUrl;
+                                webmodel.SupportedPlatforms = 1;
+                                webmodel.IsPrivate = 0;
+
+                                webmodel.LastChecked = DateTime.Today.ToString();
+
+
+                                string latestVersion = "";
+
+                                foreach(UnityPackage package in a.UnityPackages)
                                 {
-                                    model.QuestSupported = true;
-                                    webmodel.SupportedPlatforms = 3;
+                                    if(package.UnityVersion.CompareTo(latestVersion) > 0)
+                                    {
+                                        latestVersion = package.UnityVersion;
+                                    }
+
+                                    if(package.Platform == "android")
+                                    {
+                                        model.QuestSupported = true;
+                                        webmodel.SupportedPlatforms = 3;
+                                    }
                                 }
+                                model.Version = latestVersion;
+                                webmodel.UnityVersion = latestVersion;
+                                webmodel.Version = a._Version;
+
+                                webModels.Add(webmodel);
+                                avatarModels.Add(model);
+                            } catch(Exception e)
+                            {
                             }
-
-                            webmodel.UnityVersion = latestVersion;
-                            webmodel.Version = a._Version;
-
-                            avatarModels.Add(model);
-                        }
-                        catch (Exception e)
-                        {
-                            
                         }
 
-                        
-                    }
-                    
 
-                    //Set result to AvatarModelsList
-                    //Order Task result by dateAdded
-                    AvatarModelsList = avatarModels;
-                    Loading = false;
-                    
-                    KlauenUtils.exportToKlauentec(webModels);
-                });
+                        //Set result to AvatarModelsList
+                        //Order Task result by dateAdded
+                        AvatarModelsList = avatarModels;
+                        Loading = false;
 
-                
-            }
-            else
+                        KlauenUtils.exportToKlauentec(webModels);
+                    });
+            } else
             {
                 MessageBox.Show("Please wait until the current scan is finished!");
                 return;
             }
-
         }
 
 
         public async void CopyClipboard()
         {
-            if (SelectedAvatar == null)
+            if(SelectedAvatar == null)
             {
                 MessageBox.Show("Please select an avatar first!");
                 return;
@@ -270,102 +292,97 @@ namespace AviDrugZ.ViewModels
             MessageBox.Show("Copied avatar ID to clipboard!");
         }
 
-        
 
         public void FavoriteAvatar()
         {
-            if (SelectedAvatar == null)
+            if(SelectedAvatar == null)
             {
                 MessageBox.Show("Please select an avatar first!");
                 return;
             }
-            
+
             List<string> toUpdateOnlineList = new List<string>();
-            
+
 
             FavoritesSelectView favoriteWindow = new FavoritesSelectView();
-            
-            
+
+
             favoriteWindow.ShowDialog();
             string result = favoriteWindow.SelectedList;
             toUpdateOnlineList.Add(result);
-            if (favoriteWindow.DialogResult == true)
+            if(favoriteWindow.DialogResult == true)
             {
-
-
-                AddFavoriteRequest request = new AddFavoriteRequest(FavoriteType.Avatar, SelectedAvatar.AvatarID, toUpdateOnlineList);
+                AddFavoriteRequest request = new AddFavoriteRequest(
+                    FavoriteType.Avatar,
+                    SelectedAvatar.AvatarID,
+                    toUpdateOnlineList);
                 try
                 {
                     VRCApiController.instance.FavoritesApi.AddFavorite(request);
                     MessageBox.Show("Sucessfully favorited avatar!");
-                }
-                catch (Exception e)
+                } catch(Exception e)
                 {
                     MessageBox.Show("Couldn't favorite avatar due to " + e.Message);
                     //throw;
                 }
             }
-
-
         }
 
-        private void FavoriteWindow_DialogDone(object? sender, EventArgs e)
-        {
-            throw new NotImplementedException();
-        }
+        private void FavoriteWindow_DialogDone(object? sender, EventArgs e) { throw new NotImplementedException(); }
 
         public void WearAvatar()
         {
-            if (SelectedAvatar == null)
+            if(SelectedAvatar == null)
             {
                 MessageBox.Show("Please select an avatar first!");
                 return;
             }
-            
+
             VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
             MessageBox.Show("Sucessfully worn avatar!");
         }
 
         public void SearchForAvatars(bool author)
         {
-            
-            if (!Loading)
+            if(!Loading)
             {
                 Loading = true;
 
                 Task<ObservableCollection<AvatarModel>> task = null;
                 //Start Task to get avatars 
 
-                if (author)
+                if(author)
                 {
-                    if (SelectedAvatar == null) { return; }
+                    if(SelectedAvatar == null)
+                    {
+                        return;
+                    }
                     task = WebManager.getAvatarsByAuthor(SelectedAvatar.AuthorName);
-                }
-                else
+                } else
                 {
-                    if (SelectedSearchType == SearchType.Name)
+                    if(SelectedSearchType == SearchType.Name)
                     {
                         task = WebManager.getAvatarsByName(SearchText);
-                    }
-                    else if (SelectedSearchType == SearchType.Author)
+                    } else if(SelectedSearchType == SearchType.Author)
                     {
                         task = WebManager.getAvatarsByAuthor(SearchText);
                     }
                 }
                 //Run Task asnychronosly
-                task.ContinueWith((t) =>
-                {
-                    //Set result to AvatarModelsList
-                    ObservableCollection<AvatarModel> taskResult = t.Result;
+                task.ContinueWith(
+                    (t) =>
+                    {
+                        //Set result to AvatarModelsList
+                        ObservableCollection<AvatarModel> taskResult = t.Result;
 
-                    //Order Task result by dateAdded
-                    taskResult = new ObservableCollection<AvatarModel>(taskResult.OrderByDescending(x => x.DateAdded));
+                        //Order Task result by dateAdded
+                        taskResult = new ObservableCollection<AvatarModel>(
+                            taskResult.OrderByDescending(x => x.DateAdded));
 
-                    AvatarModelsList = taskResult;
-                    Loading = false;
-                });
+                        AvatarModelsList = taskResult;
+                        Loading = false;
+                    });
             }
         }
     }
-
 }

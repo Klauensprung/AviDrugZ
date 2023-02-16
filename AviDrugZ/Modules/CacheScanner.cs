@@ -43,7 +43,7 @@ namespace AviDrugZ.Modules
 
             List<Task<string>> tasks = new List<Task<string>>();
             int i = 0;
-            foreach (string cache in getCacheLocations(@"H:\vrccache\Cache-WindowsPlayer").Keys)
+            foreach (string cache in getCacheLocations(cacheLocation).Keys)
             {
                 i++;
                 if (i == limit) { break; }
