@@ -1,4 +1,5 @@
 ﻿using aviDrug;
+using AviDrugZ.Modules;
 using AviDrugZ.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -26,7 +27,11 @@ namespace AviDrugZ.Views
         {
             InitializeComponent();
             this.DataContext = new LoginViewModel();
-           
+
+         //   CacheScanner scanner = new CacheScanner();
+
+            //  scanner.runScanMulti("E:\\tempcache");
+           // scanner.getAvatarIDs();
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)

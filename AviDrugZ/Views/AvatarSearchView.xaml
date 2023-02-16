@@ -69,6 +69,7 @@
             <ui:TextBox
                 Grid.Row="0"
                 Grid.Column="0"
+                KeyDown="TextBox_KeyDown"
                 Text="{Binding SearchText, Mode=TwoWay}" />
 
 
@@ -76,6 +77,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <ComboBox
                     Margin="0,0,15,0"
@@ -88,6 +90,12 @@
                     Click="Button_Click"
                     Content="Search"
                     Icon="Search12" />
+                <ui:Button
+                    Grid.Column="2"
+                    HorizontalAlignment="Stretch"
+                    Click="Button_Click_5"
+                    ToolTip="Scan Cache"
+                    Icon="ScanDash12" />
             </Grid>
 
             <ProgressBar Margin="5"

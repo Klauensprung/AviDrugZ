@@ -66,5 +66,19 @@ namespace AviDrugZ.Views
         {
             ((SearchViewModel)DataContext).CopyClipboard();
         }
+
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                ((SearchViewModel)DataContext).SearchForAvatars(false);
+            }
+        }
+
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            //Scan cache
+            ((SearchViewModel)DataContext).ScanCache();
+        }
     }
 }

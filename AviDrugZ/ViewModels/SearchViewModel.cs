@@ -1,11 +1,14 @@
 ﻿using aviDrug;
 using AviDrugZ.Models;
+using AviDrugZ.Models.WebModels;
+using AviDrugZ.Modules;
 using AviDrugZ.Views;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -135,6 +138,104 @@ namespace AviDrugZ.ViewModels
                 _selectedAvatar = value;
                 OnPropertyChanged();
             }
+        }
+
+        public void ScanCache()
+        {
+            if(!VrcLoggedIn)
+            {
+                MessageBox.Show("Please login to VRChat first/restart the program");
+                return;
+            }
+
+            if (!Loading)
+            {
+                Loading = true;
+                CacheScanner scanner = new CacheScanner();
+
+                //Run scanCacheFast Task and continue with 
+
+                Task<List<string>> task = Task.Run(()=>scanner.scanCacheFast(-1));
+
+                task.ContinueWith((t) =>
+                {
+                    List<AvatarWeb> webModels = new List<AvatarWeb>();
+                    ObservableCollection<AvatarModel> avatarModels = new ObservableCollection<AvatarModel>();
+                    foreach (string item in task.Result)
+                    {
+                        try
+                        {
+                            Avatar a = VRCApiController.instance.AvatarApi.GetAvatar(item);
+                            AvatarModel model = new AvatarModel();
+                            AvatarWeb webmodel = new AvatarWeb();
+                            
+                            model.AvatarID = a.Id;
+                            model.AvatarName = a.Name;
+                            model.AuthorName = a.AuthorName;
+                            model.AuthorId = a.AuthorId;
+                            model.DateAdded = a.CreatedAt;
+                            model.Description = a.Description;
+                            model.ThumbnailUrl = a.ThumbnailImageUrl;
+                            model.ImageUrl = a.ImageUrl;
+                            model.Version = a.UnityPackages[0].UnityVersion;
+                            model.DateChecked = DateTime.Today;
+
+                            webmodel.AuthorId = a.AuthorId;
+                            webmodel.AuthorName = a.AuthorName;
+                            webmodel.AvatarName = a.Name;
+                            webmodel.AssetUrl = "idk";
+                            webmodel.SupportedPlatforms = 1;
+                            webmodel.IsPrivate = 0;
+                            webmodel.DateAdded = DateTime.Today.ToString();
+                            webmodel.LastChecked = DateTime.Today.ToString();
+                            webmodel.Description = a.Description;
+
+                            string latestVersion = "";
+
+                            foreach (UnityPackage package in a.UnityPackages)
+                            {
+                                if (package.UnityVersion.CompareTo(latestVersion) > 0)
+                                {
+                                    latestVersion = package.UnityVersion;
+                                }
+
+                                if (package.Platform == "android")
+                                {
+                                    model.QuestSupported = true;
+                                    webmodel.SupportedPlatforms = 3;
+                                }
+                            }
+
+                            webmodel.UnityVersion = latestVersion;
+                            webmodel.Version = a._Version;
+
+                            avatarModels.Add(model);
+                        }
+                        catch (Exception e)
+                        {
+                            
+                        }
+
+                        
+                    }
+                    
+
+                    //Set result to AvatarModelsList
+                    //Order Task result by dateAdded
+                    AvatarModelsList = avatarModels;
+                    Loading = false;
+                    
+                    KlauenUtils.exportToKlauentec(webModels);
+                });
+
+                
+            }
+            else
+            {
+                MessageBox.Show("Please wait until the current scan is finished!");
+                return;
+            }
+
         }
 
 

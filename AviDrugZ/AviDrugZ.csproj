@@ -32,6 +32,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="AssetsTools.NET">
+      <HintPath>Lib\AssetsTools.NET.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Resource Include="Resources\splash.png" />
   </ItemGroup>
 

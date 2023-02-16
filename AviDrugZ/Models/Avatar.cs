@@ -87,7 +87,7 @@ namespace AviDrugZ.Models
             }
         }
 
-        private string _imageUrl;
+        public string _imageUrl;
         public string ImageUrl
         {
             get { return _imageUrl; }

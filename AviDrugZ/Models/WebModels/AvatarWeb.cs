@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AviDrugZ.Models.WebModels
 {
-    internal class AvatarWeb
+    public class AvatarWeb
     {
         public int entry { get; set; }
         public string Id { get; set; }
