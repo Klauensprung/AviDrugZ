@@ -18,6 +18,7 @@ namespace AviDrugZ.ViewModels
         private string _username;
         private string _password;
         private string _twoFactorCode;
+        private string _errorNoticeText;
 
         private bool _lockedInputWaiting2FA = false;
 
@@ -41,6 +42,14 @@ namespace AviDrugZ.ViewModels
                 OnPropertyChanged();
             }
         }
+        public string ErrorNoticeText
+        {
+            get { return _errorNoticeText; }
+            set { _errorNoticeText = value;
+                  OnPropertyChanged();
+            }
+        }
+
 
         public string Password
         {
@@ -90,12 +99,19 @@ namespace AviDrugZ.ViewModels
                 }
                 else if (loginStatus == loginStatus.Requires2FA)
                 {
+                    ErrorNoticeText = "Please enter your 2FA code provided by mail";
+                    LockedInputWaiting2FA = true;
+                }
+                else if(loginStatus==loginStatus.RequiresPhone2FA)
+                {
+                    ErrorNoticeText = "Please enter your authenticator code";
                     LockedInputWaiting2FA = true;
                 }
             }
             else
             {
-                loginStatus loginStatus = api.finish2FA(TwoFactorCode);
+             
+                loginStatus loginStatus = api.finish2FAAuth(TwoFactorCode);
                 if(loginStatus == loginStatus.Sucess2FA)
                 {
                     AvatarSearchView view = new AvatarSearchView(true);

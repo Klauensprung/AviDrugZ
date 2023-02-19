@@ -43,6 +43,31 @@ namespace AviDrugZ
 
         }
 
+        public static async Task<ObservableCollection<AvatarModel>> getAvatarsLatest()
+        {
+            //Make a HttpWebRequest to the API on smokes
+            //Get the JSON response
+            //Parse the JSON response into a list of Avatar objects
+
+            string url = "https://avatars.bs002.de/avatars/avatars.php?latest";
+
+            HttpClient client = new();
+            ObservableCollection<AvatarWeb> webAvatars = await client.GetFromJsonAsync<ObservableCollection<AvatarWeb>>(url);
+
+            ObservableCollection<AvatarModel> avatars = new();
+            if (webAvatars != null)
+            {
+                foreach (AvatarWeb webAvatar in webAvatars)
+                {
+                    avatars.Add(parseAvatar(webAvatar));
+                }
+            }
+            return avatars;
+
+        }
+
+
+
         public static async Task<ObservableCollection<AvatarModel>> getAvatarsByAuthor(string authorName)
         {
             //Make a HttpWebRequest to the API on smokes

@@ -53,13 +53,13 @@ namespace AviDrugZ.Modules
             Task.WaitAll(tasks.ToArray());
 
             List<string> avatarIds = new List<string>();
-
+            
             string outputBuffer = "";
 
+            
             foreach (Task<string> task in tasks)
             {
                 string data = task.Result;
-
                 if (data != null)
                 {
                     //ID has 36 characters

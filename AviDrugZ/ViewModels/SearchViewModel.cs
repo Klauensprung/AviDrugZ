@@ -156,7 +156,7 @@ namespace AviDrugZ.ViewModels
             if(!VrcLoggedIn)
             {
                 MessageBox.Show("Please login to VRChat first/restart the program");
-                return;
+             //   return;
             }
 
             if(!Loading)
@@ -342,6 +342,28 @@ namespace AviDrugZ.ViewModels
             MessageBox.Show("Sucessfully worn avatar!");
         }
 
+        public void GetLatestAvatars()
+        {
+            if (!Loading)
+            {
+                Loading = true;
+                Task<ObservableCollection<AvatarModel>> task = WebManager.getAvatarsLatest();
+                task.ContinueWith(
+                        (t) =>
+                        {
+                            try
+                            {
+                                AvatarModelsList = task.Result;
+                            }
+                            catch (Exception)
+                            {
+
+                            }
+                            Loading = false;
+                        });
+            }
+         }
+
         public void SearchForAvatars(bool author)
         {
             if(!Loading)
@@ -373,13 +395,21 @@ namespace AviDrugZ.ViewModels
                     (t) =>
                     {
                         //Set result to AvatarModelsList
-                        ObservableCollection<AvatarModel> taskResult = t.Result;
+                        try
+                        {
+                            ObservableCollection<AvatarModel> taskResult = t.Result;
 
-                        //Order Task result by dateAdded
-                        taskResult = new ObservableCollection<AvatarModel>(
-                            taskResult.OrderByDescending(x => x.DateAdded));
+                            //Order Task result by dateAdded
+                            taskResult = new ObservableCollection<AvatarModel>(
+                                taskResult.OrderByDescending(x => x.DateAdded));
 
-                        AvatarModelsList = taskResult;
+                            AvatarModelsList = taskResult;
+                        }
+                        catch (Exception e)
+                        {
+                            Loading = false;
+                            //  throw;
+                        }
                         Loading = false;
                     });
             }

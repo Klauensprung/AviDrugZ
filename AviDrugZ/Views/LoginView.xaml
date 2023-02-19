@@ -58,7 +58,7 @@
             </StackPanel>
         </Grid>
 
-        <ui:Badge Grid.Row="6" Visibility="{Binding ShowNotice}" Appearance="Danger" Content="Please enter the 2FA Code" />
+        <ui:Badge Grid.Row="6" Visibility="{Binding ShowNotice}" Appearance="Danger" Content="{Binding ErrorNoticeText}" />
         <Image Grid.Row="2" Margin="10" Source="/AviDrugZ;component/Resources/splash.png" />
         
         <Grid Grid.Row="3">

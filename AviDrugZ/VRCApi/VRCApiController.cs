@@ -27,14 +27,99 @@ namespace aviDrug
         public AvatarsApi AvatarApi;
         public FavoritesApi FavoritesApi;
         public string userID;
+        public loginStatus currentLoginStatus;
 
         private Configuration Configuration;
-        public void saveHeadersToConfig()
-        {
+        private string sessionValue = "";
 
+        public loginStatus finishPhoneFA(string otpCode)
+        {
+            var config = Configuration;
+            //Make HTTPGETRequest POST  "https://api.vrchat.cloud/api/1/auth/twofactor"
+            string cookieValue = sessionValue;
+
+            var url = "https://api.vrchat.cloud/api/1/auth/twofactorauth/totp/verify";
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "POST";
+
+            //Set auth cookie
+            request.CookieContainer = new CookieContainer();
+            request.CookieContainer.Add(new Cookie("auth", cookieValue, "/", "api.vrchat.cloud"));
+
+            //add json body with 2FA code
+            string jsonBody = "{\"code\":\"" + otpCode + "\"}";
+
+            //set content type to application/json
+            request.ContentType = "application/json";
+
+            //set content length to json body length
+            request.ContentLength = jsonBody.Length;
+
+            //set connection keep alive
+            request.KeepAlive = true;
+
+            //set encodign to gzip, deflate, br
+            request.Headers["Accept-Encoding"] = "gzip, deflate, br";
+
+            //set accept to */*
+            request.Accept = "*/*";
+
+            //set user agent to PostmanRuntime/7.26.10
+            request.UserAgent = "PostmanRuntime/7.26.10";
+
+            //set cache control to no-cache
+            request.Headers["Cache-Control"] = "no-cache";
+
+            //get request stream
+            Stream dataStream = request.GetRequestStream();
+
+            //write json body to request stream
+            dataStream.Write(Encoding.UTF8.GetBytes(jsonBody), 0, jsonBody.Length);
+
+            //get response
+            var response = (HttpWebResponse)request.GetResponse();
+            string responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            Console.WriteLine(responseString);
+
+            //get json result from responseString and read 'verified' field into string
+            dynamic json = JsonConvert.DeserializeObject(responseString);
+            string verified = json["verified"].ToString();
+
+            if (verified == "True")
+            {
+                log.Debug("Sucessfully verified via 2FA !");
+
+                //Get cookie sent from server
+                string twoFACookie = response.Headers["Set-Cookie"];
+                //Get cookie name and value from set cookie header
+                string cookieN = twoFACookie.Split(';')[0].Split('=')[0];
+                //get cookie value
+                string cookieV = twoFACookie.Split(';')[0].Split('=')[1];
+
+                config.AddApiKey(cookieN, cookieV);
+                Configuration = config;
+
+                finalizeLogin();
+                return loginStatus.Sucess2FA;
+            }
+            else
+            {
+                return loginStatus.NotLoggedIn;
+            }
         }
 
-        private string sessionValue = "";
+        public loginStatus finish2FAAuth(string code)
+        {
+            if(currentLoginStatus==loginStatus.Requires2FA)
+            {
+                return finish2FA(code);
+            }
+            else if(currentLoginStatus == loginStatus.RequiresPhone2FA)
+            {
+                return finishPhoneFA(code);
+            }
+            return loginStatus.NotLoggedIn;
+        }
 
         public loginStatus finish2FA(string twoFactorCode)
         {
@@ -117,7 +202,8 @@ namespace aviDrug
             LoggedIn,
             NotLoggedIn,
             Requires2FA,
-            Sucess2FA
+            Sucess2FA,
+            RequiresPhone2FA
         }
         
         private void finalizeLogin()
@@ -200,6 +286,12 @@ namespace aviDrug
                         sessionValue = cookieValue;
                         return loginStatus.Requires2FA;
                     }
+                    else if(responseString.Contains("totp"))
+                    {
+                        Configuration = config;
+                        sessionValue = cookieValue;
+                        return loginStatus.RequiresPhone2FA;
+                    }
                 }
                 else
                 {
@@ -227,15 +319,15 @@ namespace aviDrug
             Configuration Config = new Configuration();
             Config.Username = user;
             Config.Password = pass;
-            loginStatus status = loginToVRC(ref Config);
+            currentLoginStatus = loginToVRC(ref Config);
             Configuration = Config;
 
-            if (status == loginStatus.LoggedIn)
+            if (currentLoginStatus == loginStatus.LoggedIn)
             {
                 finalizeLogin();
             }
 
-            return status;
+            return currentLoginStatus;
         }
 
         private async Task tryLogin()

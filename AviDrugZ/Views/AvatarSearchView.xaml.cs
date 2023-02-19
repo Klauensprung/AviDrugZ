@@ -35,6 +35,8 @@ namespace AviDrugZ.Views
             {
                 ((SearchViewModel)DataContext).VrcLoggedIn = true;
             }
+
+            ((SearchViewModel)DataContext).GetLatestAvatars();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

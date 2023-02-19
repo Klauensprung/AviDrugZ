@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace AviDrugZ
@@ -16,6 +17,7 @@ namespace AviDrugZ
     public static class KlauenUtils
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(KlauenUtils));
+
         public static void exportToKlauentec(List<AvatarWeb> allAvatars)
         {
             int updated = 0;
@@ -28,7 +30,9 @@ namespace AviDrugZ
                 //and the header "Content-Type: application/json"
 
                 //Create a POST request
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://avatars.bs002.de/avatars/avatars.php");
+                string liveUrl = "https://avatars.bs002.de/avatars/avatars.php";
+                string debugUrl = "http://127.0.0.1/avatars/avatars.php";
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(liveUrl);
                 request.Method = "POST";
                 request.ContentType = "application/json";
 
@@ -40,7 +44,7 @@ namespace AviDrugZ
                 catch (Exception e)
                 {
                     continue;
-                   //yikes cross thread stuff
+                    //yikes cross thread stuff
                 }
 
                 //Send the json string as the body
@@ -72,6 +76,78 @@ namespace AviDrugZ
 
             Log.Info("Uploaded " + updated + " avatars");
             Log.Info("Failed to upload " + failed + " avatars");
+        }
+
+        private static Regex alphanumeric = new Regex("^[a-zA-Z0-9\\-]*$");
+        public static string ReadUntilFieldValue_avtr(string filePath, string UntilText)
+        {
+            try
+            {
+                BinaryReader reader = new BinaryReader(System.IO.File.Open(filePath, FileMode.Open), Encoding.ASCII);
+                int bufferLimit = UntilText.Length;
+
+
+                var buffer = new StringBuilder();
+                bool foundEndOfLine = false;
+                char ch;
+                while (!foundEndOfLine)
+                {
+                    try
+                    {
+                        ch = reader.ReadChar();
+                        buffer.Append(ch);
+                        if (buffer.Length > UntilText.Length)
+                        {
+                            buffer.Remove(0, 1);
+                        }
+
+                        if (buffer.ToString() == UntilText)
+                        {
+                            bool endRead = false;
+                            var avatarIDBuilder = new StringBuilder();
+                            int underscores = 0;
+
+                            int idnr = 0;
+                            while (!endRead)
+                            {
+                                idnr++;
+                                ch = reader.ReadChar();
+
+                                if ((idnr == 9||idnr==14||idnr==19||idnr==24) && ch != '-') endRead = true;
+                                avatarIDBuilder.Append(ch);
+                                if (idnr == 36)
+                                {
+                                    string avatarId = avatarIDBuilder.ToString();
+                                    if (!alphanumeric.IsMatch(avatarId))
+                                    {
+                                        endRead = true;
+                                        break;
+                                    }
+                                    
+                                    underscores++;
+                                    reader.Close();
+                                    return avatarId;
+                                }
+                            }
+                            return null;
+                        }
+                    }
+                    catch (EndOfStreamException ex)
+                    {
+                        reader.Close();
+                        return null;
+                    }
+
+
+                }
+
+                return null;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e.Message);
+                return null;
+            }
         }
 
         public static string ReadUntilFieldValue(string filePath, string UntilText)
@@ -129,8 +205,6 @@ namespace AviDrugZ
                     {
                         reader.Close();
                         return null;
-                        //  if (result.Length == 0) return null;
-                        // else break;
                     }
 
 
@@ -144,5 +218,6 @@ namespace AviDrugZ
                 return null;
             }
         }
+
     }
 }
