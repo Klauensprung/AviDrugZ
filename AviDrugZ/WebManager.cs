@@ -25,8 +25,11 @@ namespace AviDrugZ
             //Urlencode avatarName
             string urlEncodedAvatarName = System.Web.HttpUtility.UrlEncode(avatarName);
             url += "?name=" + urlEncodedAvatarName;
-            
+
+           
+
             HttpClient client = new();
+            client.DefaultRequestHeaders.Add("User-Agent", "AviDrugZ v2");
             ObservableCollection<AvatarWeb> webAvatars = await client.GetFromJsonAsync<ObservableCollection<AvatarWeb>>(url);
 
             ObservableCollection<AvatarModel> avatars = new();
@@ -51,7 +54,10 @@ namespace AviDrugZ
 
             string url = "https://avatars.bs002.de/avatars/avatars.php?latest";
 
+
             HttpClient client = new();
+            //Add User agent
+            client.DefaultRequestHeaders.Add("User-Agent", "AviDrugZ v2");
             ObservableCollection<AvatarWeb> webAvatars = await client.GetFromJsonAsync<ObservableCollection<AvatarWeb>>(url);
 
             ObservableCollection<AvatarModel> avatars = new();
@@ -80,6 +86,9 @@ namespace AviDrugZ
             url += "?author=" + urlEncodedAvatarName;
 
             HttpClient client = new();
+            //Set User agent
+            client.DefaultRequestHeaders.Add("User-Agent", "AviDrugZ v2");
+
             ObservableCollection<AvatarWeb> webAvatars = await client.GetFromJsonAsync<ObservableCollection<AvatarWeb>>(url);
 
             ObservableCollection<AvatarModel> avatars = new();

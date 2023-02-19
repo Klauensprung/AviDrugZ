@@ -213,6 +213,8 @@ namespace aviDrug
             WorldApi = new WorldsApi(Configuration);
             AvatarApi = new AvatarsApi(Configuration);
             FavoritesApi = new FavoritesApi(Configuration);
+
+            userID = AuthApi.GetCurrentUser().Id;
         }
         private loginStatus loginToVRC(ref Configuration config)
         {
@@ -328,28 +330,6 @@ namespace aviDrug
             }
 
             return currentLoginStatus;
-        }
-
-        private async Task tryLogin()
-        {
-
-            try
-            {
-                // Calling "GetCurrentUser(Async)" logs you in if you are not already logged in.
-                CurrentUser CurrentUser = await AuthApi.GetCurrentUserAsync();
-                //    userID = CurrentUser.Id;
-                // MessageBox.Show(String.Format("Logged in as {0}, Current Avatar {1}", CurrentUser.DisplayName, CurrentUser.CurrentAvatar));
-
-                //User OtherUser = await UserApi.GetUserAsync("usr_c1644b5b-3ca4-45b4-97c6-a2a0de70d469");
-                // MessageBox.Show(String.Format("Found user {0}, joined {1}", OtherUser.DisplayName, OtherUser.DateJoined));
-
-
-            }
-            catch (ApiException e)
-            {
-                log.Error(e.Message);
-                throw e;
-            }
         }
     }
 }

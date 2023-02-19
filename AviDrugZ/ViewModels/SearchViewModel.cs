@@ -204,6 +204,12 @@ namespace AviDrugZ.ViewModels
                                 AvatarModel model = new AvatarModel();
                                 AvatarWeb webmodel = new AvatarWeb();
 
+                                if (a.AuthorId == VRCApiController.instance.userID)
+                                {
+                                    continue;
+                                }
+
+
                                 model.AvatarID = a.Id;
                                 model.AvatarName = a.Name;
                                 model.AuthorName = a.AuthorName;

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
+using aviDrug;
 
 namespace AviDrugZ
 {
@@ -34,6 +35,7 @@ namespace AviDrugZ
                 string debugUrl = "http://127.0.0.1/avatars/avatars.php";
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(liveUrl);
                 request.Method = "POST";
+                request.UserAgent = "AviDrugZ v2 | " + VRCApiController.instance.userID;
                 request.ContentType = "application/json";
 
                 string json = "";
