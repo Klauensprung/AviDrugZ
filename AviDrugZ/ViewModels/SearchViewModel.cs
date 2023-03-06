@@ -4,6 +4,7 @@ using AviDrugZ.Models.WebModels;
 using AviDrugZ.Modules;
 using AviDrugZ.Views;
 using Ookii.Dialogs.Wpf;
+using Polly.Caching;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -159,11 +160,13 @@ namespace AviDrugZ.ViewModels
              //   return;
             }
 
+          
             if(!Loading)
             {
                 Loading = true;
                 CacheScanner scanner = new CacheScanner();
 
+                // Interlocked.Add(ref totalCount, total);
 
                 //Run scanCacheFast Task and continue with 
                 string cacheFolder = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -185,22 +188,25 @@ namespace AviDrugZ.ViewModels
                 }
                 cachePath = dialog.SelectedPath;
 
-                //    cachePath = dialog.SelectedPath;
+                NyanLoading loading = new NyanLoading();
+                loading.Show();
 
-                //FOLDER BROWSER DIALOG WHERE WPF ?? WHERE ?? WTF IS WRONG WITH THIS FRAMEWORK
-
-                Task<List<string>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath));
+                Task<List<string>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath,loading));
 
                 task.ContinueWith(
                     (t) =>
                     {
-                        List<AvatarWeb> webModels = new List<AvatarWeb>();
+                        loading.setProgress(0);
+                        loading.setMaxProgress(t.Result.Count);
+                        loading.setLoadingString("Checking avatars...");
+                        List <AvatarWeb> webModels = new List<AvatarWeb>();
                         ObservableCollection<AvatarModel> avatarModels = new ObservableCollection<AvatarModel>();
                         foreach(string item in task.Result)
                         {
                             try
                             {
                                 Avatar a = VRCApiController.instance.AvatarApi.GetAvatar(item);
+                                loading.addProgress(1f);
                                 AvatarModel model = new AvatarModel();
                                 AvatarWeb webmodel = new AvatarWeb();
 
@@ -208,7 +214,7 @@ namespace AviDrugZ.ViewModels
                                 {
                                     continue;
                                 }
-
+                                
 
                                 model.AvatarID = a.Id;
                                 model.AvatarName = a.Name;
@@ -259,6 +265,7 @@ namespace AviDrugZ.ViewModels
                                 avatarModels.Add(model);
                             } catch(Exception e)
                             {
+                                loading?.addProgress(1f);
                             }
                         }
 
@@ -267,6 +274,8 @@ namespace AviDrugZ.ViewModels
                         //Order Task result by dateAdded
                         AvatarModelsList = avatarModels;
                         Loading = false;
+
+                        loading?.closeMe();
 
                         KlauenUtils.exportToKlauentec(webModels);
                     });
@@ -390,7 +399,11 @@ namespace AviDrugZ.ViewModels
                 {
                     if(SelectedSearchType == SearchType.Name)
                     {
-                        task = WebManager.getAvatarsByName(SearchText);
+                        if (SearchText == "") { Loading = false; GetLatestAvatars();return;}
+                        else
+                        {
+                            task = WebManager.getAvatarsByName(SearchText);
+                        }                     
                     } else if(SelectedSearchType == SearchType.Author)
                     {
                         task = WebManager.getAvatarsByAuthor(SearchText);

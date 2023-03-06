@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 using aviDrug;
+using AviDrugZ.Views;
 
 namespace AviDrugZ
 {
@@ -152,13 +153,15 @@ namespace AviDrugZ
             }
         }
 
-        public static string ReadUntilFieldValue(string filePath, string UntilText)
+        public static string ReadUntilFieldValue(string filePath, string UntilText,NyanLoading? loadingView = null)
         {
             try
             {
+
                 BinaryReader reader = new BinaryReader(System.IO.File.Open(filePath, FileMode.Open), Encoding.ASCII);
                 int bufferLimit = UntilText.Length;
 
+                
 
                 var buffer = new StringBuilder();
                 bool foundEndOfLine = false;
@@ -191,6 +194,9 @@ namespace AviDrugZ
                                         //Read avatar ID sucessfully, return ID
                                         string aviID = avatarIDBuilder.ToString().Split('_')[2];
                                         reader.Close();
+                                        
+                                        loadingView?.addProgress(1f);
+                                        
                                         return aviID;
                                     }
                                 }
@@ -200,11 +206,13 @@ namespace AviDrugZ
 
                             reader.Close();
 
+                            loadingView?.addProgress(1f);
                             return null;
                         }
                     }
                     catch (EndOfStreamException ex)
                     {
+                        loadingView?.addProgress(1f);
                         reader.Close();
                         return null;
                     }
@@ -216,6 +224,7 @@ namespace AviDrugZ
             }
             catch (Exception e)
             {
+                loadingView?.addProgress(1f);
                 Log.Error(e.Message);
                 return null;
             }

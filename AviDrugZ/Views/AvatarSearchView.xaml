@@ -41,7 +41,7 @@
                 <ui:NotifyIcon
                     FocusOnLeftClick="True"
                     MenuOnRightClick="True"
-                    TooltipText="WPF UI">
+                    TooltipText="AviDrugZ - Avatar Search">
 
                     <ui:NotifyIcon.Menu>
                         <ContextMenu>
@@ -117,6 +117,15 @@
                 CanUserAddRows="False"
                 ItemsSource="{Binding AvatarModelsList}"
                 SelectedItem="{Binding SelectedAvatar}">
+                <DataGrid.Resources>
+                    <Style TargetType="{x:Type DataGridCell}">
+                        <Style.Triggers>
+                            <Trigger Property="DataGridCell.IsSelected" Value="True">
+                                <Setter Property="Background" Value="Black" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </DataGrid.Resources>
                 <DataGrid.Columns>
                     <DataGridTemplateColumn Width="3*" Header="Image">
                         <DataGridTemplateColumn.CellTemplate>

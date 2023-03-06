@@ -65,7 +65,7 @@ namespace aviDrug
             request.Accept = "*/*";
 
             //set user agent to PostmanRuntime/7.26.10
-            request.UserAgent = "PostmanRuntime/7.26.10";
+            request.UserAgent = "SearchWorld/V3/Nocturn9992@proton.me";
 
             //set cache control to no-cache
             request.Headers["Cache-Control"] = "no-cache";
@@ -154,7 +154,7 @@ namespace aviDrug
             request.Accept = "*/*";
 
             //set user agent to PostmanRuntime/7.26.10
-            request.UserAgent = "PostmanRuntime/7.26.10";
+            request.UserAgent = "SearchWorld/V3/Nocturn9992@proton.me";
 
             //set cache control to no-cache
             request.Headers["Cache-Control"] = "no-cache";
@@ -244,7 +244,7 @@ namespace aviDrug
             request.Accept = "*/*";
 
             //set user agent to PostmanRuntime/7.26.10
-            request.UserAgent = "PostmanRuntime/7.26.10";
+            request.UserAgent = "SearchWorld/V3/Nocturn9992@proton.me";
 
             //set cache control to no-cache
             request.Headers["Cache-Control"] = "no-cache";

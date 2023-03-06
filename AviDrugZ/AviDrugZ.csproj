@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
-    <SignAssembly>False</SignAssembly>
+    <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
@@ -14,11 +14,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Lib\Nyan.wav" />
     <None Remove="Resources\splash.png" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Resources\splash.ico" />
+    <Content Include="Resources\splash.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Lib\" />
     <Folder Include="VRCApi\" />
   </ItemGroup>
 
@@ -39,6 +43,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Resources\Nyan.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Resource Include="Resources\splash.png" />
   </ItemGroup>
 
