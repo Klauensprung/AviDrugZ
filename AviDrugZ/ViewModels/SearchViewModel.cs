@@ -353,7 +353,15 @@ namespace AviDrugZ.ViewModels
                 return;
             }
 
-            VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
+            try
+            {
+                VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+                return;
+            }
             MessageBox.Show("Sucessfully worn avatar!");
         }
 
