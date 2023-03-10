@@ -12,7 +12,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <ApplicationIcon>Resources\splash.ico</ApplicationIcon>
     <AssemblyVersion>3.1</AssemblyVersion>
-    <FileVersion>3.1</FileVersion>
+    <FileVersion>3.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
