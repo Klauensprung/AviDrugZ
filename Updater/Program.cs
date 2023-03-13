@@ -35,16 +35,23 @@ public class UpdateInstall
 
         string response = client.GetStringAsync(latestRelease).GetAwaiter().GetResult();
 
-        //Convert response to json object
-        var json = Newtonsoft.Json.Linq.JObject.Parse(response);
+        var jsonResponse = System.Text.Json.JsonDocument.Parse(response);
 
-        //Get changelog
-        string changelog = json["body"].ToString();
+        //Get changelog 
+        string changelog = jsonResponse.RootElement
+                            .GetProperty("body").ToString();
 
         //Get latest version from json object
-        string latestVersion = json["tag_name"].ToString();
-        string latestDownload = json["assets"][0]["browser_download_url"].ToString();
-        string filename = json["assets"][0]["name"].ToString();
+        string latestVersion = jsonResponse.RootElement
+                            .GetProperty("tag_name").ToString();
+
+        //Get download url from json object
+        string latestDownload = jsonResponse.RootElement
+                            .GetProperty("assets").EnumerateArray().First().GetProperty("browser_download_url").ToString();
+
+        //Get filename from json object
+        string filename = jsonResponse.RootElement
+                            .GetProperty("assets").EnumerateArray().First().GetProperty("name").ToString();
 
         //Print all relevant date from the response to the console
         Console.WriteLine("------------------------------");

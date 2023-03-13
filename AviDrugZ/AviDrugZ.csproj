@@ -61,7 +61,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="if $(ConfigurationName) == Release $(ProjectDir)postbuild.bat $(SolutionDir)Updater\bin\Release\net6.0 $(SolutionDir)AviDrugZ\bin\Release\net6.0-windows\publish\win-x64" />
+    <Exec Command="if $(ConfigurationName) == Release $(ProjectDir)postbuild.bat $(SolutionDir)Updater\bin\Release\net6.0\publish\win-x64 $(SolutionDir)AviDrugZ\bin\Release\net6.0-windows\publish\win-x64" />
   </Target>
 
 </Project>

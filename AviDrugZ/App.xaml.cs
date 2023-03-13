@@ -30,26 +30,28 @@ namespace AviDrugZ
                     if (result == MessageBoxResult.Yes)
                     {
                         //Start Update Process update.exe in directory with current folder location as argument
-
                         string currentPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory());
 
                         //Combine path to update.exe
                         string updatePath = System.IO.Path.Combine(currentPath, "Updater.exe");
 
-                        string oldUpdater = System.IO.Path.Combine(currentPath, "Updater_old.exe");
-
-                        //Check if old updater exists
-                        if (System.IO.File.Exists(oldUpdater))
+                        //Rename updater in updatePath to Updater_old if exists
+                        if (System.IO.File.Exists(updatePath))
                         {
-                            //Delete old updater
-                            System.IO.File.Delete(oldUpdater);
+                            System.IO.File.Move(updatePath, System.IO.Path.Combine(currentPath, "Updater_old.exe"),true);
                         }
-
-                        //Rename updater in updatePath to Updater_old.exe
-                        System.IO.File.Move(updatePath, System.IO.Path.Combine(currentPath, "Updater_old.exe"));
+                        
+                        //Prepare update process
+                        ProcessStartInfo updateProcess = new ProcessStartInfo
+                        {
+                            FileName = System.IO.Path.Combine(currentPath, "Updater_old.exe"),
+                            Arguments = currentPath,
+                            UseShellExecute = true,
+                            Verb = "runas"
+                        };
 
                         //Run updater_old.exe with current path as argument
-                        Process.Start(System.IO.Path.Combine(currentPath, "Updater_old.exe"), currentPath);
+                        Process.Start(updateProcess);
 
                         //Close AviDrugZ
                         Environment.Exit(0);
