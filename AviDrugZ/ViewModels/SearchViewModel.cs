@@ -1,10 +1,14 @@
 ﻿using aviDrug;
 using AviDrugZ.Models;
+using AviDrugZ.Models.VRC;
 using AviDrugZ.Models.WebModels;
 using AviDrugZ.Modules;
 using AviDrugZ.Views;
+using log4net.Repository.Hierarchy;
+using Newtonsoft.Json;
 using Ookii.Dialogs.Wpf;
 using Polly.Caching;
+using RestSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -18,7 +22,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 using VRChat.API.Model;
+using static AviDrugZ.Modules.LiveScanner;
 
 namespace AviDrugZ.ViewModels
 {
@@ -50,6 +56,17 @@ namespace AviDrugZ.ViewModels
         }
 
         private string _avatarCount = "";
+
+        private int _avatarsNew = 0;
+        public int AvatarsNew
+        {
+            get { return _avatarsNew; }
+            set
+            {
+                _avatarsNew = value;
+                OnPropertyChanged();
+            }
+        }
 
         public string AvatarCount
         {
@@ -144,6 +161,66 @@ namespace AviDrugZ.ViewModels
             }
         }
 
+        public void OpenAvatarFolder()
+        {
+            //Open cache location in new folder
+            if(SelectedAvatar == null)
+            {
+                MessageBox.Show("Please select an avatar first");
+                return;
+            }
+
+            if (SelectedAvatar.CacheLocation == null) return;
+            //Trim last 8 letters from cacheLocations
+            string directory = SelectedAvatar.CacheLocation.Substring(0, SelectedAvatar.CacheLocation.Length - 7);
+
+
+
+
+
+            if (!Directory.Exists(directory))
+            {
+                MessageBox.Show("Avatar cache location not found");
+                return;
+            }
+
+            //Open folder directory
+
+
+            var psi = new System.Diagnostics.ProcessStartInfo() { FileName = directory, UseShellExecute = true };
+            System.Diagnostics.Process.Start(psi);
+      
+        }
+
+        //For non logged in users, asking directly the vrcdb endpoint for this avatars info
+        public static AvatarModel ConvertToAvatarModel(string json)
+        {
+            try
+            {
+                //Parse json to List<AvatarSimple>
+                AvatarSimple avatar = JsonConvert.DeserializeObject<AvatarSimple>(json);
+
+                AvatarModel newModel = new AvatarModel();
+                newModel.AvatarID = avatar.Id;
+                newModel.AvatarName = avatar.AvatarName;
+                newModel.AuthorName = avatar.AuthorName;
+                newModel.Description = avatar.Description;
+                newModel.ThumbnailUrl = avatar.ThumbnailUrl;
+                newModel.ImageUrl = avatar.ThumbnailUrl;
+                newModel.QuestSupported = avatar.SupportedPlatforms == 3 ? true : false;
+                newModel.Version = avatar.UnityVersion;
+                newModel.DateAdded = avatar.DateAdded;
+
+                return newModel;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+                return null;
+            }
+        }
+
+
         public void ScanCache()
         {
             if(MessageBox.Show(
@@ -154,15 +231,19 @@ namespace AviDrugZ.ViewModels
                 return;
 
 
-            if(!VrcLoggedIn)
-            {
-                MessageBox.Show("Please login to VRChat first/restart the program");
-             //   return;
-            }
+            //if(!VrcLoggedIn)
+            //{
+            //    MessageBox.Show("Please login to VRChat first/restart the program");
+            // //   return;
+            //}
 
           
             if(!Loading)
             {
+
+                //abort live scan
+                if(LiveScanning) abortLiveScanning();
+
                 Loading = true;
                 CacheScanner scanner = new CacheScanner();
 
@@ -191,7 +272,7 @@ namespace AviDrugZ.ViewModels
                 NyanLoading loading = new NyanLoading();
                 loading.Show();
 
-                Task<List<string>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath,loading));
+                Task<List<CacheResult>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath,loading));
 
                 task.ContinueWith(
                     (t) =>
@@ -201,71 +282,104 @@ namespace AviDrugZ.ViewModels
                         loading.setLoadingString("Checking avatars...");
                         List <AvatarWeb> webModels = new List<AvatarWeb>();
                         ObservableCollection<AvatarModel> avatarModels = new ObservableCollection<AvatarModel>();
-                        foreach(string item in task.Result)
+
+                        foreach(CacheResult item in task.Result)
                         {
+                            illegalmarker:
                             try
                             {
-                                Avatar a = VRCApiController.instance.AvatarApi.GetAvatar(item);
-                                loading.addProgress(1f);
-                                AvatarModel model = new AvatarModel();
-                                AvatarWeb webmodel = new AvatarWeb();
+                                //Get avatar info from vrcdb.bs002.de/avatars/Avatar/{avatarID}
+                                string url = "https://vrcdb.bs002.de/avatars/Avatar/avtr_" + item.AvatarID;
+                                System.Net.Http.HttpClient client = new System.Net.Http.HttpClient();
+                                client.DefaultRequestHeaders.Add("User-Agent", "AviDrugZ v2");
+                                string json = client.GetStringAsync(url).Result;
 
-                                if (a.AuthorId == VRCApiController.instance.userID)
+              
+
+                                //if not status code 500
+                                if(json.Contains("Internal Server Error"))
                                 {
+                                    //add dummy avatar
+                                    AvatarModel unknownModel = new AvatarModel();
+                                    unknownModel.CacheLocation = item.CacheLocation;
+                                    unknownModel.AvatarID = item.AvatarID;
+                                    unknownModel.AuthorName = "Unknown";
+                                    unknownModel.AvatarName = "Unknown";
+                                    unknownModel.Description = item.AvatarID;
+                                    unknownModel.DateDownloaded = System.IO.File.GetLastWriteTime(item.CacheLocation);
+                                    unknownModel.DateAdded = DateTime.Now;
+                                    unknownModel.IsPrivate = false;
+
+                                    //Try if we can get the avatar from vrcdb
+                                    var newModel = KlauenUtils.exportToVRCDB(item.AvatarID);
+
+                                    if(newModel != null)
+                                    {
+                                        AvatarModel newDisplayModel = new AvatarModel();
+                                        newDisplayModel.AvatarID = newModel.Id;
+                                        newDisplayModel.AvatarName = newModel.Name;
+                                        newDisplayModel.AuthorName = newModel.AuthorName;
+                                        newDisplayModel.Description = newModel.Description;
+                                        newDisplayModel.ThumbnailUrl = newModel.ThumbnailImageUrl;
+                                        newDisplayModel.ImageUrl = newModel.ImageUrl;
+                                        newDisplayModel.QuestSupported = newModel.SupportedPlatforms == "3";
+                                        newDisplayModel.Version = newModel.UnityVersion;
+                                        newDisplayModel.DateDownloaded = System.IO.File.GetLastWriteTime(item.CacheLocation);
+                                        newDisplayModel.DateAdded = DateTime.Now;
+                                        newDisplayModel.IsPrivate = false;
+                                        newDisplayModel.CacheLocation = item.CacheLocation;
+
+                                        
+                                        avatarModels.Add(newDisplayModel);
+                                        AvatarsNew += 1;
+                                        
+                                    } else
+                                    {
+                                        avatarModels.Add(unknownModel);
+                                    }
+
+                                    loading.addProgress(1f);
                                     continue;
                                 }
+
+                                AvatarModel a = ConvertToAvatarModel(json);
+                             
+                                a.DateDownloaded = System.IO.File.GetLastWriteTime(item.CacheLocation);
+                                a.CacheLocation = item.CacheLocation;
+                                loading.addProgress(1f);
+
+                                                                
                                 
+                                avatarModels.Add(a);
 
-                                model.AvatarID = a.Id;
-                                model.AvatarName = a.Name;
-                                model.AuthorName = a.AuthorName;
-                                model.AuthorId = a.AuthorId;
-                                model.DateAdded = a.CreatedAt;
-                                model.Description = a.Description;
-                                model.ThumbnailUrl = a.ThumbnailImageUrl;
-                                model.ImageUrl = a.ImageUrl;
-                                model.Version = a.UnityPackages[0].UnityVersion;
-                                model.DateChecked = DateTime.Today;
-
-                                webmodel.Id = a.Id;
-                                webmodel.AvatarName = a.Name;
-                                webmodel.AuthorName = a.AuthorName;
-                                webmodel.AuthorId = a.AuthorId;
-                                webmodel.DateAdded = DateTime.Today.ToString();
-                                webmodel.Description = a.Description;
-                                webmodel.ThumbnailUrl = a.ThumbnailImageUrl;
-                                webmodel.ImageUrl = a.ImageUrl;
-                                webmodel.AssetUrl = a.AssetUrl;
-                                webmodel.SupportedPlatforms = 1;
-                                webmodel.IsPrivate = 0;
-
-                                webmodel.LastChecked = DateTime.Today.ToString();
-
-
-                                string latestVersion = "";
-
-                                foreach(UnityPackage package in a.UnityPackages)
-                                {
-                                    if(package.UnityVersion.CompareTo(latestVersion) > 0)
-                                    {
-                                        latestVersion = package.UnityVersion;
-                                    }
-
-                                    if(package.Platform == "android")
-                                    {
-                                        model.QuestSupported = true;
-                                        webmodel.SupportedPlatforms = 3;
-                                    }
-                                }
-                                model.Version = latestVersion;
-                                webmodel.UnityVersion = latestVersion;
-                                webmodel.Version = a._Version;
-
-                                webModels.Add(webmodel);
-                                avatarModels.Add(model);
                             } catch(Exception e)
                             {
-                                loading?.addProgress(1f);
+
+                                //is rate limited ?
+                                if(e.Message.Contains("429"))
+                                {
+                                    Thread.Sleep(5000);
+                                    goto illegalmarker;
+                                }
+
+                                //Get date added from cache write time
+                                DateTime dateAdded = System.IO.File.GetLastWriteTime(item.CacheLocation);
+
+                                //add dummy avatar
+                                AvatarModel unknownModel = new AvatarModel();
+                                unknownModel.CacheLocation = item.CacheLocation;
+                                unknownModel.AvatarID = item.AvatarID;
+                                unknownModel.AuthorName = "Unknown";
+                                unknownModel.AvatarName = item.AvatarID;
+                                unknownModel.Description = "Unknown";
+                                unknownModel.DateAdded = dateAdded;
+                                unknownModel.IsPrivate = true;
+                                avatarModels.Add(unknownModel);
+
+                                loading.addProgress(1f);
+                                continue;
+
+                             //   loading?.addProgress(1f);
                             }
                         }
 
@@ -276,8 +390,8 @@ namespace AviDrugZ.ViewModels
                         Loading = false;
 
                         loading?.closeMe();
-
-                        KlauenUtils.exportToKlauentec(webModels);
+                      
+                       // export?
                     });
             } else
             {
@@ -345,6 +459,25 @@ namespace AviDrugZ.ViewModels
 
         private void FavoriteWindow_DialogDone(object? sender, EventArgs e) { throw new NotImplementedException(); }
 
+        public void OpenUrl(string url)
+        {
+            try
+            {
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = url,
+                    UseShellExecute = true // This is crucial for URLs
+                };
+                System.Diagnostics.Process.Start(psi);
+            }
+            catch (Exception ex)
+            {
+                // Handle or log the exception as needed
+                Console.WriteLine("Failed to open URL: " + ex.Message);
+            }
+        }
+
+
         public void WearAvatar()
         {
             if(SelectedAvatar == null)
@@ -355,14 +488,26 @@ namespace AviDrugZ.ViewModels
 
             try
             {
-                VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
+                if (!VrcLoggedIn)
+                {
+                    //Start browser with avatar page  safely in standard browser
+                    string url = "https://vrchat.com/home/avatar/" + SelectedAvatar.AvatarID;
+                    OpenUrl(url);
+                
+                }
+                else
+                {
+                    //Wear avatar
+                    VRCApiController.instance.AvatarApi.SelectAvatar(SelectedAvatar.AvatarID);
+                    MessageBox.Show("Sucessfully worn avatar!");
+                }
             }
             catch (Exception e)
             {
                 MessageBox.Show(e.Message);
                 return;
             }
-            MessageBox.Show("Sucessfully worn avatar!");
+            
         }
 
         public void GetLatestAvatars()
@@ -387,11 +532,18 @@ namespace AviDrugZ.ViewModels
             }
          }
 
+        public void abortLiveScanning()
+        {
+            scanner = null;
+            LiveScanning = false;
+        }
+
         public void SearchForAvatars(bool author)
         {
             if(!Loading)
             {
                 Loading = true;
+                if (LiveScanning) abortLiveScanning();
 
                 Task<ObservableCollection<AvatarModel>> task = null;
                 //Start Task to get avatars 
@@ -440,6 +592,186 @@ namespace AviDrugZ.ViewModels
                         Loading = false;
                     });
             }
+        }
+
+        private bool liveScanning = false;
+
+        public bool LiveScanning
+        {
+            get { return liveScanning; }
+            set
+            {
+                liveScanning = value;
+                OnPropertyChanged();
+            }
+        }
+
+        LiveScanner scanner;
+
+        public void ScanCacheLive()
+        {
+            if (!liveScanning)
+            {
+                AvatarModelsList = new ObservableCollection<AvatarModel>();
+                LiveScanning = true;
+                string cachePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low\\VRChat\\VRChat\\Cache-WindowsPlayer";
+                scanner = new LiveScanner(cachePath);
+
+                scanner.Avatars.CollectionChanged += HandleAvatarCollectionChanged;
+                AvatarLogger.InitializeSession();
+            }
+            else
+            {
+                //disable live scanning
+                scanner = null;
+                LiveScanning = false;
+            }
+        }
+
+        int failed = 0;
+        private void HandleAvatarCollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            {
+                AvatarModel latestAvatar = scanner.Avatars.LastOrDefault();
+                if (latestAvatar == null) return;
+
+                string avatarID = latestAvatar.AvatarID;
+                string cacheLocation = latestAvatar.CacheLocation;
+                string url = $"https://vrcdb.bs002.de/avatars/Avatar/avtr_{avatarID}";
+
+                try
+                {
+                    ProcessAvatar(url, cacheLocation, avatarID);
+                }
+                catch (Exception ex)
+                {
+                    failed++;
+                    ProcessException(avatarID, cacheLocation);
+                   
+                }
+
+                AvatarCount = AvatarModelsList.Count.ToString() + " avatars found. " + AvatarsNew + " were newly added. " + failed + " were unkown";
+            }
+        }
+
+        private void ProcessAvatar(string url, string cacheLocation, string avatarID)
+        {
+            using (var client = new System.Net.Http.HttpClient())
+            {
+                string json = client.GetStringAsync(url).Result;
+                if (json.Contains("Internal Server Error"))
+                {
+                    AddUnknownModel(avatarID, cacheLocation);
+                    return;
+                }
+
+                AvatarModel avatar = ConvertToAvatarModel(json);
+                avatar.DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation);
+                avatar.CacheLocation = cacheLocation;
+                AvatarLogger.LogAvatarModel(avatar);
+                App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(avatar));
+            }
+        }
+
+        private void AddUnknownModel(string avatarID, string cacheLocation)
+        {
+            AvatarModel unknownModel = CreateUnknownAvatarModel(avatarID, cacheLocation);
+            var newModel = KlauenUtils.exportToVRCDB(avatarID);
+            if (newModel != null)
+            {
+                AvatarModel newDisplayModel = CreateDisplayModelFromNewModel(newModel, cacheLocation);
+                App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(newDisplayModel));
+                AvatarLogger.LogAvatarModel(newDisplayModel);
+                AvatarsNew += 1;
+            }
+            else
+            {
+                App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(unknownModel));
+                AvatarLogger.LogAvatarModel(unknownModel);
+            }
+        }
+
+        private void ProcessException(string avatarID, string cacheLocation)
+        {
+            AddUnknownModel(avatarID, cacheLocation);
+        }
+
+        private AvatarModel CreateUnknownAvatarModel(string avatarID, string cacheLocation)
+        {
+            return new AvatarModel
+            {
+                AvatarID = avatarID,
+                CacheLocation = cacheLocation,
+                AuthorName = "Unknown",
+                AvatarName = "Unknown",
+                Description = avatarID,
+                DateAdded = DateTime.Now,
+                DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation),
+                IsPrivate = false
+            };
+        }
+
+        private AvatarModel CreateDisplayModelFromNewModel(dynamic newModel, string cacheLocation)
+        {
+            return new AvatarModel
+            {
+                AvatarID = newModel.Id,
+                AvatarName = newModel.Name,
+                AuthorName = newModel.AuthorName,
+                Description = newModel.Description,
+                ThumbnailUrl = newModel.ThumbnailImageUrl,
+                ImageUrl = newModel.ImageUrl,
+                QuestSupported = newModel.SupportedPlatforms == "3",
+                Version = newModel.UnityVersion,
+                DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation)
+            };
+        }
+
+        public void LoadScansFromCache()
+        {
+            string initialPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "scans");
+
+            // Ensure the directory exists
+            if (!Directory.Exists(initialPath))
+            {
+                Directory.CreateDirectory(initialPath); // Optionally create if it does not exist
+            }
+
+            MessageBox.Show("Navigate to the scans directory of the program and select a scan log file.");
+
+
+            VistaOpenFileDialog dialog = new VistaOpenFileDialog();
+            dialog.Title = "Select a scan log file. It is located in the scans directory of the program";
+            dialog.Filter = "JSON files (*.json)|*.json";
+            dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            dialog.RestoreDirectory = true;
+
+            if (dialog.ShowDialog() == true) // Ensure dialog result is checked correctly
+            {
+                if (string.IsNullOrEmpty(dialog.FileName))
+                {
+                    return;
+                }
+
+                string cacheLocation = dialog.FileName;
+                AvatarModelsList = LiveScanner.LoadScansFromSession(cacheLocation);
+            }
+        }
+
+        internal void OpenInVRCX()
+        {
+            //run this command with the currently selected avatar id, if avatar is selected vrcx://avatar/avtr_2abf43dc-074c-489a-a20d-70e813949ffe
+            if (SelectedAvatar == null)
+            {
+                MessageBox.Show("Please select an avatar first!");
+                return;
+            }
+
+            string url = "vrcx://avatar/" + SelectedAvatar.AvatarID;
+            OpenUrl(url);
+
+
         }
     }
 }

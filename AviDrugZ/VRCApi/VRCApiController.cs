@@ -1,4 +1,5 @@
-﻿using log4net;
+﻿using AviDrugZ.Models.VRC;
+using log4net;
 using Newtonsoft.Json;
 using System;
 using System.IO;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows;
 using VRChat.API.Api;
@@ -106,6 +108,88 @@ namespace aviDrug
             {
                 return loginStatus.NotLoggedIn;
             }
+        }
+
+        public void downloadWorld(string worldID)
+        {
+
+            WorldJson worldInfo = getWorldDownload(worldID);
+            string downloadLink = worldInfo.unityPackages[0].assetUrl;
+
+
+            
+            //Download file from downloadLink with HttpClient
+            using (var client = new WebClient())
+            {
+
+                    client.Headers.Add("Cookie", $"auth={sessionValue}");
+
+
+                    client.Headers.Add("apiKey", "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26");
+
+
+                    client.Headers.Add("User-Agent", @"SearchWorld/V3/Nocturn9992@proton.me\");
+                    string filename = $"{worldID}.wrld";
+
+                //Check if file already exists
+                if (!System.IO.File.Exists(filename))
+                {
+                    client.DownloadFile(downloadLink, filename);
+                }
+            }
+
+
+
+
+
+
+        }
+
+        public WorldJson getWorldDownload(string world)
+        {
+            //curl -X GET "https://api.vrchat.cloud/api/1/worlds/{worldId}/{instanceId}" \
+            //-b "apiKey=JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26; auth={authCookie}"
+
+            var config = Configuration;
+            //Make HTTPGETRequest POST  "https://api.vrchat.cloud/api/1/auth/twofactor"
+            string cookieValue = config.AccessToken;
+
+            var url = $"https://api.vrchat.cloud/api/1/worlds/{world}";
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.Method = "GET";
+
+            //Set auth cookie
+            request.CookieContainer = new CookieContainer();
+            request.CookieContainer.Add(new Cookie("apiKey", "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26", "/", "api.vrchat.cloud"));
+
+            request.CookieContainer.Add(new Cookie("auth", sessionValue, "/", "api.vrchat.cloud"));
+
+            //set content type to application/json
+            request.ContentType = "application/json";
+
+            //set connection keep alive
+            request.KeepAlive = true;
+           
+            //set encodign to gzip, deflate, br
+          //  request.Headers["Accept-Encoding"] = "gzip, deflate, br";
+
+            //set accept to */*
+            request.Accept = "*/*";
+
+            //set user agent to PostmanRuntime/7.26.10
+            request.UserAgent = "SearchWorld/V3/Nocturn9992@proton.me";
+
+            //set cache control to no-cache
+            request.Headers["Cache-Control"] = "no-cache";
+
+            //get response
+            var response = (HttpWebResponse)request.GetResponse();
+            string responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+            WorldJson worldJS = JsonConvert.DeserializeObject<WorldJson>(responseString);
+
+            return worldJS;
+      //      Console.WriteLine(responseString);
         }
 
         public loginStatus finish2FAAuth(string code)

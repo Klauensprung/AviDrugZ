@@ -20,11 +20,14 @@ namespace AviDrugZ
             //Make a HttpWebRequest to the API on smokes
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
-           
-            string url = "https://avatars.bs002.de/avatars/avatars.php";
+
+
+
+            //string url = "https://vrcdb.bs002.de/avatars/Avatar/AviDrugZ";
+            string url = "http://vrcdb.bs002.de/avatars/Avatar/AviDrugZ";
             //Urlencode avatarName
             string urlEncodedAvatarName = System.Web.HttpUtility.UrlEncode(avatarName);
-            url += "?name=" + urlEncodedAvatarName;
+            url += "?search=" + urlEncodedAvatarName;
 
            
 
@@ -46,13 +49,15 @@ namespace AviDrugZ
 
         }
 
+
         public static async Task<ObservableCollection<AvatarModel>> getAvatarsLatest()
         {
             //Make a HttpWebRequest to the API on smokes
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
 
-            string url = "https://avatars.bs002.de/avatars/avatars.php?latest";
+            // string url = "https://vrcdb.bs002.de/avatars/Avatar/AviDrugZ?search=%";
+            string url = "https://vrcdb.bs002.de/avatars/Avatar/AviDrugZ?search=%";
 
 
             HttpClient client = new();
@@ -80,7 +85,8 @@ namespace AviDrugZ
             //Get the JSON response
             //Parse the JSON response into a list of Avatar objects
 
-            string url = "https://avatars.bs002.de/avatars/avatars.php";
+            //   string url = "http://localhost:5234/avatars/Avatar/AviDrugZ";
+            string url = "https://vrcdb.bs002.de/avatars/Avatar/AviDrugZ";
             //Urlencode avatarName
             string urlEncodedAvatarName = System.Web.HttpUtility.UrlEncode(authorName);
             url += "?author=" + urlEncodedAvatarName;

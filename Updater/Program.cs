@@ -8,9 +8,18 @@ public class UpdateInstall
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting update process for AviDrugZ");
-        
-        
-        string startLocation = args[0];
+
+        string startLocation = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+
+        //Check if a start location was provided
+        if (args.Length > 0)
+        {
+            startLocation = args[0];
+        }
+
+
+
+
         // Create a new instance of the Stopwatch class, 
         // and start the timing. 
         Stopwatch stopWatch = new Stopwatch();
@@ -86,6 +95,11 @@ public class UpdateInstall
         string[] files = Directory.GetFiles(dirs[0]);
         foreach (string file in files)
         {
+            //Skip updater
+            if (file.Contains("Updater.exe"))
+            {
+                continue;
+            }
             string name = Path.GetFileName(file);
             string dest = Path.Combine(extractPath, name);
             File.Copy(file, dest, true);

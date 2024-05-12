@@ -31,6 +31,8 @@ namespace AviDrugZ.Views
             InitializeComponent();
             this.DataContext = new SearchViewModel();
 
+            //VRCApiController.instance.downloadWorld("wrld_57c59f78-cf53-4d4b-ac79-bc0c89094507");
+
             if (loggedIn)
             {
                 ((SearchViewModel)DataContext).VrcLoggedIn = true;
@@ -84,6 +86,26 @@ namespace AviDrugZ.Views
             //Scan cache
             
             ((SearchViewModel)DataContext).ScanCache();
+        }
+
+        private void Button_Click_6(object sender, RoutedEventArgs e)
+        {
+            ((SearchViewModel)DataContext).OpenAvatarFolder();
+        }
+
+        private void Button_Click_7(object sender, RoutedEventArgs e)
+        {
+            ((SearchViewModel)DataContext).ScanCacheLive();
+        }
+
+        private void Button_Click_8(object sender, RoutedEventArgs e)
+        {
+            ((SearchViewModel)DataContext).LoadScansFromCache();
+        }
+
+        private void Button_Click_9(object sender, RoutedEventArgs e)
+        {
+            ((SearchViewModel)DataContext).OpenInVRCX();
         }
     }
 }

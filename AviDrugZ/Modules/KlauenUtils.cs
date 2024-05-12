@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using static System.Net.Mime.MediaTypeNames;
 using aviDrug;
 using AviDrugZ.Views;
+using AviDrugZ.Models.VRC;
 
 namespace AviDrugZ
 {
@@ -20,65 +21,68 @@ namespace AviDrugZ
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(KlauenUtils));
 
-        public static void exportToKlauentec(List<AvatarWeb> allAvatars)
+        public static AvatarVRC? exportToVRCDB(string avatarID)
         {
-            int updated = 0;
-            int failed = 0;
-            foreach (AvatarWeb avi in allAvatars)
+
+            //Create a POST request
+            string liveUrl = "https://search.bs002.de/api/Avatar/putavatar";
+
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(liveUrl);
+            request.Method = "PUT";
+            request.UserAgent = "AviDrugZ v2 | " + VRCApiController.instance.userID;
+            request.ContentType = "application/json";
+
+            //Make a custom json with avatarid (Id) and user (userId)
+            //Create new json object with those fields, not with serialized object
+            string json = "{\"Id\":\"" + "avtr_"+avatarID + "\",\"UserId\":\"" + VRCApiController.instance.userID + "\"}";
+
+            //Send the json string as the body
+            using (var streamWriter = new StreamWriter(request.GetRequestStream()))
             {
+                streamWriter.Write(json);
+                streamWriter.Flush();
+                streamWriter.Close();
+            }
 
-                //Make a POST json request to https://avatars.bs002.de/avatars/avatars.php
-                //with the json string as the body
-                //and the header "Content-Type: application/json"
-
-                //Create a POST request
-                string liveUrl = "https://avatars.bs002.de/avatars/avatars.php";
-                string debugUrl = "http://127.0.0.1/avatars/avatars.php";
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(liveUrl);
-                request.Method = "POST";
-                request.UserAgent = "AviDrugZ v2 | " + VRCApiController.instance.userID;
-                request.ContentType = "application/json";
-
-                string json = "";
-                try
-                {
-                    json = JsonConvert.SerializeObject(avi);
-                }
-                catch (Exception e)
-                {
-                    continue;
-                    //yikes cross thread stuff
-                }
-
-                //Send the json string as the body
-                using (var streamWriter = new StreamWriter(request.GetRequestStream()))
-                {
-                    streamWriter.Write(json);
-                    streamWriter.Flush();
-                    streamWriter.Close();
-                }
-
-                //Get the response
+            try
+            {
                 var httpResponse = (HttpWebResponse)request.GetResponse();
+
+                //Check for success
                 using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
                 {
                     var result = streamReader.ReadToEnd();
+
+                    //parse to AvatarVRC
+                    AvatarVRC avatarVRC = JsonConvert.DeserializeObject<AvatarVRC>(result);
+                    return avatarVRC;
+
                     if (result.EndsWith("Not Created.\"}"))
                     {
-                        Log.Info("Avatar " + avi.AvatarName + " not created");
-                        failed++;
+                        Log.Info("Avatar " + avatarID + " not created");
+
                     }
                     else
                     {
-                        updated++;
-                        Log.Info("Avatar " + avi.AvatarName + " created");
+                        Log.Info("Avatar " + avatarID + " created");
                     }
                 }
 
             }
+            catch (WebException e)
+            {
+                Log.Error(e.Message);
+                return null;
+            }
 
-            Log.Info("Uploaded " + updated + " avatars");
-            Log.Info("Failed to upload " + failed + " avatars");
+
+
+
+
+
+
+
+
         }
 
         private static Regex alphanumeric = new Regex("^[a-zA-Z0-9\\-]*$");
@@ -153,12 +157,12 @@ namespace AviDrugZ
             }
         }
 
-        public static string ReadUntilFieldValue(string filePath, string UntilText,NyanLoading? loadingView = null)
+        public static CacheResult ReadUntilFieldValue(string filePath, string UntilText,NyanLoading? loadingView = null)
         {
             try
             {
 
-                BinaryReader reader = new BinaryReader(System.IO.File.Open(filePath, FileMode.Open), Encoding.ASCII);
+                BinaryReader reader = new BinaryReader(System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), Encoding.ASCII);
                 int bufferLimit = UntilText.Length;
 
                 
@@ -196,8 +200,8 @@ namespace AviDrugZ
                                         reader.Close();
                                         
                                         loadingView?.addProgress(1f);
-                                        
-                                        return aviID;
+
+                                        return new CacheResult() { AvatarID = aviID, CacheLocation = filePath };
                                     }
                                 }
                             }

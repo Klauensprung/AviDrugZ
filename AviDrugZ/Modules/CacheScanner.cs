@@ -16,6 +16,8 @@ using AviDrugZ.Models;
 using System.Diagnostics;
 using System.Windows.Markup;
 using AviDrugZ.Views;
+using System.Windows.Automation;
+using AviDrugZ.Models.VRC;
 
 namespace AviDrugZ.Modules
 {
@@ -31,7 +33,7 @@ namespace AviDrugZ.Modules
         static int avatarCount = 0;
         static int worldCount = 0;
 
-        public async Task<List<string>> scanCacheFast(int limit, string cacheLocation, NyanLoading? loadingView = null)
+        public async Task<List<CacheResult>> scanCacheFast(int limit, string cacheLocation, NyanLoading? loadingView = null)
         {
             int aviFound = 0;
             List<AvatarModel> avis = new List<AvatarModel>();
@@ -39,7 +41,7 @@ namespace AviDrugZ.Modules
             Stopwatch stop = new Stopwatch();
             stop.Start();
 
-            List<Task<string>> tasks = new List<Task<string>>();
+            List<Task<CacheResult>> tasks = new List<Task<CacheResult>>();
             int i = 0;
             Dictionary<string, DateTime> locations = getCacheLocations(cacheLocation);
             NyanLoading.instance.setMaxProgress(locations.Count);
@@ -54,37 +56,43 @@ namespace AviDrugZ.Modules
 
             Task.WaitAll(tasks.ToArray());
 
-            List<string> avatarIds = new List<string>();
-
             string outputBuffer = "";
 
+            List<CacheResult> validResults = new List<CacheResult>();
 
-            foreach (Task<string> task in tasks)
+            foreach (Task<CacheResult> task in tasks)
             {
-                string data = task.Result;
-                if (data != null)
-                {
-                    //ID has 36 characters
-                    if (data.Length == 36)
+               //Check if task isnt null
+               if (task.Result ==null) { continue; }
+       
+
+                    string data = task.Result.AvatarID;
+                    if (data != null)
                     {
-                        data = "avtr_" + data;
-                        avatarIds.Add(data);
-                        outputBuffer += data + ";";
-                        log.Info("Found avi " + data);
-                        aviFound++;
+                        //ID has 36 characters
+                        if (data.Length == 36)
+                        {
+                            data = "avtr_" + data;
+                            validResults.Add(task.Result);
+                            outputBuffer += data + ";";
+                            log.Info("Found avi " + data);
+                            aviFound++;
+                        }
+                        else
+                        {
+                            log.Info("Found malformed ID");
+                        }
                     }
-                    else
-                    {
-                        log.Info("Found malformed ID");
-                    }
-                }
+                
             }
 
 
             System.IO.File.WriteAllText("avatarLog.txt", outputBuffer);
             stop.Stop();
             log.Info("Found " + aviFound + " avatars in " + stop.ElapsedMilliseconds + "ms");
-            return avatarIds;
+
+
+            return validResults;
         }
 
 
@@ -111,7 +119,7 @@ namespace AviDrugZ.Modules
                         if (System.IO.File.Exists(cacheDataPath))
                         {
                             FileInfo info = new FileInfo(cacheDataPath);
-                            dataLocations.Add(cacheDataPath, info.CreationTime);
+                                dataLocations.Add(cacheDataPath, info.CreationTime);
                         }
                     }
                 }

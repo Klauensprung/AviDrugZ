@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Security.Policy;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -14,9 +15,22 @@ namespace AviDrugZ.Models
 {
     public class AvatarModel : BaseModel
     {
+        private string? _cacheLocation;
 
-        
+        public string? CacheLocation
+        {
+            get { return _cacheLocation; }
+            set
+            {
+                _cacheLocation = value;
+                OnPropertyChanged();
+            }
+        }
+
+        [JsonIgnore]
         private BitmapImage? _aviImage;
+
+        [JsonIgnore]
         public BitmapImage? AviImage
         {
             get {
@@ -51,6 +65,17 @@ namespace AviDrugZ.Models
             }
         }
 
+        private DateTime? _dateDownloaded;
+        public DateTime? DateDownloaded
+        {
+            get { return _dateDownloaded; }
+            set
+            {
+                _dateDownloaded = value;
+                OnPropertyChanged();
+            }
+        }
+
         private DateTime ?_dateAdded;
         public DateTime ?DateAdded
         {
@@ -62,7 +87,10 @@ namespace AviDrugZ.Models
             }
         }
 
+        [JsonIgnore]
         private BitmapImage? _fullAviImage;
+
+        [JsonIgnore]
         public BitmapImage? FullAviImage
         {
             get

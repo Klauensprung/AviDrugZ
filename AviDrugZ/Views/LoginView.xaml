@@ -50,11 +50,11 @@
         <Grid Grid.Row="1">
             <StackPanel Orientation="Vertical">
 
-                <ui:TextBox Grid.Row="0" Text="{Binding Username}"  PlaceholderText="Username" />
+                <ui:TextBox IsEnabled="False" Grid.Row="0" Text="{Binding Username}"  PlaceholderText="Username" />
             <Border Height="10"></Border>
-                <ui:PasswordBox x:Name="PasswordBox" Grid.Row="1" KeyDown="PasswordBox_KeyDown"  PlaceholderText="Password" />
+                <ui:PasswordBox IsEnabled="False" x:Name="PasswordBox" Grid.Row="1" KeyDown="PasswordBox_KeyDown"  PlaceholderText="Password" />
             <Border Height="20"></Border>
-                <ui:TextBox Grid.Row="2" Text="{Binding TwoFactorCode}"  PlaceholderText="2FA Code" />
+                <ui:TextBox IsEnabled="False" Grid.Row="2" Text="{Binding TwoFactorCode}"  PlaceholderText="2FA Code" />
             </StackPanel>
         </Grid>
 
@@ -66,7 +66,7 @@
                 <ColumnDefinition Width="1*"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <ui:Button Grid.Column="0" HorizontalAlignment="Stretch" Content="Login with VRChat" Click="Login_Click" />
+            <ui:Button Grid.Column="0" IsEnabled="False" HorizontalAlignment="Stretch" Content="Login with VRChat" Click="Login_Click" />
 
             <ui:Button Grid.Column="1" HorizontalAlignment="Stretch" Content="Skip Login" Click="Login_Skip" />
         </Grid>

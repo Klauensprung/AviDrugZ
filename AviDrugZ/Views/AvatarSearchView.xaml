@@ -62,7 +62,7 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="1.75*" />
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
@@ -77,6 +77,8 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <ComboBox
@@ -98,6 +100,42 @@
                     Click="Button_Click_5"
                     ToolTip="Scan Cache"
                     Icon="ScanDash12" />
+                <ui:Button
+                Margin="0,0,5,0"
+                Grid.Column="3"
+                HorizontalAlignment="Stretch"
+                Click="Button_Click_7"
+                ToolTip="Scan Live">
+
+                    <ui:Button.Style>
+                        <Style TargetType="{x:Type ui:Button}" BasedOn="{StaticResource {x:Type ui:Button}}">
+                            <!-- Default Background Set Here -->
+                            <Setter Property="Background" Value="#2d2d2d"/>
+                            <Setter Property="Icon" Value="ToggleLeft48"></Setter>
+
+                            <!-- Style Triggers -->
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding LiveScanning}" Value="True">
+                                    <Setter Property="Background" Value="Green"/>
+                                    <Setter Property="Icon" Value="ToggleRight48"></Setter>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding LiveScanning}" Value="False">
+                                    <Setter Property="Background" Value="#2d2d2d"/>
+                                    <Setter Property="Icon" Value="ToggleLeft48"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+  
+
+                    </ui:Button.Style>
+                </ui:Button>
+                <ui:Button Grid.Column="4"
+                    Margin="0,0,5,0"
+                    HorizontalAlignment="Stretch"
+                           Icon="ArrowImport24"
+                    Click="Button_Click_8"
+                           ToolTip="Click to load saved avatar sessions" >
+                </ui:Button>
             </Grid>
 
             <ProgressBar Margin="5"
@@ -164,6 +202,19 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
+                    
+                    
+                    <DataGridTemplateColumn Width="2*" Header="Date Downloaded">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ui:Card>
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontSize="15" Text="{Binding DateDownloaded,StringFormat=G}" />
+                                    </StackPanel>
+                                </ui:Card>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
 
                     <DataGridTemplateColumn Width="2*" Header="Date">
                         <DataGridTemplateColumn.CellTemplate>
@@ -213,11 +264,29 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         
                         <Label Grid.Column="0" Padding="15" Content="{Binding SelectedAvatar.AvatarName}" />
                         <ui:Button Click="Button_Click_4" Grid.Column="1">
                             <ui:SymbolIcon FontSize="25" ToolTip="Copy AvatarID to Clipboard" Symbol="ClipboardCheckmark24"></ui:SymbolIcon>
+                        </ui:Button>
+                        <ui:Button Click="Button_Click_9"  Grid.Column="2">
+                            <ui:SymbolIcon FontSize="25" ToolTip="Open in VRCX" Symbol="Open16"></ui:SymbolIcon>
+                        </ui:Button>
+
+                        <ui:Button Grid.Column="2" Click="Button_Click_6">
+                            <ui:Button.Style>
+                                <Style TargetType="{x:Type ui:Button}">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedAvatar.CacheLocation}" Value="{x:Null}">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ui:Button.Style>
+                            <ui:SymbolIcon FontSize="25" ToolTip="Open Location" Symbol="Folder20"></ui:SymbolIcon>
                         </ui:Button>
                         <!--<ui:TextBox Text="{Binding SelectedAvatar.AuthorId}" />-->
                     </Grid>
@@ -243,8 +312,8 @@
                     <ui:Button  Click="SearchAvatar_Click" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                         <ui:SymbolIcon FontSize="25" ToolTip="Search for author" Symbol="Search12"></ui:SymbolIcon>
                     </ui:Button>
-                    <ui:Button IsEnabled="{Binding VrcLoggedIn}" Click="Button_Click_3" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                        <ui:SymbolIcon FontSize="25" ToolTip="Wear avatar" Symbol="ArrowForwardDownPerson24"></ui:SymbolIcon>
+                    <ui:Button  Click="Button_Click_3" Grid.Column="2" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ui:SymbolIcon FontSize="25" ToolTip="Open avatar on the website" Symbol="ExpandUpLeft16"></ui:SymbolIcon>
                     </ui:Button>
                 </Grid>
             </Grid>
