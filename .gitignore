@@ -407,3 +407,5 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+/AviDrugZ/Properties/PublishProfiles/FolderProfile.pubxml.user
+/AviDrugZ/AviDrugZ.csproj.user
