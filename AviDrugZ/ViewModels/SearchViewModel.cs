@@ -246,6 +246,7 @@ namespace AviDrugZ.ViewModels
 
                 Loading = true;
                 CacheScanner scanner = new CacheScanner();
+    
 
                 // Interlocked.Add(ref totalCount, total);
 
@@ -271,6 +272,8 @@ namespace AviDrugZ.ViewModels
 
                 NyanLoading loading = new NyanLoading();
                 loading.Show();
+
+                AvatarLogger.InitializeSession();
 
                 Task<List<CacheResult>> task = Task.Run(() => scanner.scanCacheFast(-1, cachePath,loading));
 
@@ -331,11 +334,13 @@ namespace AviDrugZ.ViewModels
 
                                         
                                         avatarModels.Add(newDisplayModel);
+                                        AvatarLogger.LogAvatarModel(newDisplayModel);
                                         AvatarsNew += 1;
                                         
                                     } else
                                     {
                                         avatarModels.Add(unknownModel);
+                                        AvatarLogger.LogAvatarModel(unknownModel);
                                     }
 
                                     loading.addProgress(1f);
@@ -351,6 +356,7 @@ namespace AviDrugZ.ViewModels
                                                                 
                                 
                                 avatarModels.Add(a);
+                                AvatarLogger.LogAvatarModel(a);
 
                             } catch(Exception e)
                             {
@@ -745,7 +751,7 @@ namespace AviDrugZ.ViewModels
             dialog.Title = "Select a scan log file. It is located in the scans directory of the program";
             dialog.Filter = "JSON files (*.json)|*.json";
             dialog.InitialDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            dialog.RestoreDirectory = true;
+            dialog.RestoreDirectory = false;
 
             if (dialog.ShowDialog() == true) // Ensure dialog result is checked correctly
             {
@@ -756,6 +762,8 @@ namespace AviDrugZ.ViewModels
 
                 string cacheLocation = dialog.FileName;
                 AvatarModelsList = LiveScanner.LoadScansFromSession(cacheLocation);
+
+                //Make new 
             }
         }
 
