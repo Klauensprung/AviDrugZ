@@ -230,6 +230,7 @@ namespace AviDrugZ.ViewModels
                 MessageBoxResult.No)
                 return;
 
+            CacheScanning = true;
 
             //if(!VrcLoggedIn)
             //{
@@ -549,6 +550,7 @@ namespace AviDrugZ.ViewModels
             if(!Loading)
             {
                 Loading = true;
+                CacheScanning = false;
                 if (LiveScanning) abortLiveScanning();
 
                 Task<ObservableCollection<AvatarModel>> task = null;
@@ -600,6 +602,18 @@ namespace AviDrugZ.ViewModels
             }
         }
 
+        private bool _cacheScanning = false;
+
+        public bool CacheScanning
+        {
+            get { return _cacheScanning; }
+            set
+            {
+                _cacheScanning = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool liveScanning = false;
 
         public bool LiveScanning
@@ -608,6 +622,7 @@ namespace AviDrugZ.ViewModels
             set
             {
                 liveScanning = value;
+                CacheScanning = value;
                 OnPropertyChanged();
             }
         }

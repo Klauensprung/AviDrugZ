@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml" xmlns:local="clr-namespace:AviDrugZ.Lib" xmlns:viewmodels="clr-namespace:AviDrugZ.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:SearchViewModel}"
     Width="800"
     Height="450"
     mc:Ignorable="d"
@@ -14,6 +14,10 @@
     WindowBackdropType="Mica"
     WindowCornerPreference="Round"
     WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+        <local:BindingProxy x:Key="Proxy" Data="{Binding}" />
+    </Window.Resources>
 
     <Grid>
 
@@ -202,14 +206,15 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    
-                    
-                    <DataGridTemplateColumn Width="2*" Header="Date Downloaded">
+
+
+                    <DataGridTemplateColumn x:Name="dateDownloadedColumn" Header="Date Downloaded"
+                                        Visibility="{Binding Data.CacheScanning, Source={StaticResource Proxy}, Converter={StaticResource BoolToVisibilityConverter}}">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <ui:Card>
                                     <StackPanel Orientation="Vertical">
-                                        <TextBlock FontSize="15" Text="{Binding DateDownloaded,StringFormat=G}" />
+                                        <TextBlock FontSize="15" Text="{Binding DateDownloaded, StringFormat=G}" />
                                     </StackPanel>
                                 </ui:Card>
                             </DataTemplate>

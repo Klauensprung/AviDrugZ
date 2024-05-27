@@ -28,10 +28,10 @@ namespace AviDrugZ.Views
             InitializeComponent();
             this.DataContext = new LoginViewModel();
 
-         //   CacheScanner scanner = new CacheScanner();
+            //just skip login for now until api login is fixed
+            ((LoginViewModel)DataContext).SkipLogin();
+            this.Close();
 
-            //  scanner.runScanMulti("E:\\tempcache");
-           // scanner.getAvatarIDs();
         }
 
         private void Login_Click(object sender, RoutedEventArgs e)
