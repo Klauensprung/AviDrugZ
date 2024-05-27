@@ -14,7 +14,7 @@
 
 ### Important Note
 
-- ⚠️ **Login System Disabled**: The login system is temporarily disabled while we work on fixing some issues. Rest assured, we're actively working on it and will have it back up and running soon.
+- ⚠️ **Login System Disabled**: The login system is temporarily disabled.
 
 ### Get Started
 
