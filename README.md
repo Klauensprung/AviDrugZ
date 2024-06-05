@@ -3,6 +3,7 @@
 ![image](https://user-images.githubusercontent.com/36606771/219873867-2a3fb5a7-1462-4793-b9dd-3be08f8a95d2.png)
 
 **AviDrugZ** is an innovative tool designed to enhance your VRChat experience by allowing you to search for and scan VRChat avatars. It also provides powerful logging and scanning features to help you keep track of avatars and manage your cache efficiently.
+#[YoutubeTutorial]https://www.youtube.com/watch?v=o1wAW7vppBU
 
 ### Features
 
