@@ -7,29 +7,17 @@
     <UseWPF>true</UseWPF>
     <Platforms>AnyCPU;x64</Platforms>
     <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile></AssemblyOriginatorKeyFile>
     <DelaySign>False</DelaySign>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
     <ApplicationIcon>Resources\splash.ico</ApplicationIcon>
     <AssemblyVersion>3.1</AssemblyVersion>
     <FileVersion>3.1</FileVersion>
+    <AssemblyOriginatorKeyFile>J:\Git\AviDrugZ\MyKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Lib\Nyan.wav" />
     <None Remove="Resources\splash.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <WrapperTool>tlbimp</WrapperTool>
-      <VersionMinor>0</VersionMinor>
-      <VersionMajor>1</VersionMajor>
-      <Guid>f935dc20-1cf0-11d0-adb9-00c04fd58a0b</Guid>
-      <Lcid>0</Lcid>
-      <Isolated>false</Isolated>
-      <EmbedInteropTypes>true</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
 
   <ItemGroup>
@@ -39,10 +27,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Abraham.Windows.Shell" Version="1.0.2" />
     <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="Ookii.Dialogs.Wpf" Version="5.0.1" />
     <PackageReference Include="VRChat.API" Version="1.9.1" />
+    <PackageReference Include="WindowsShortcutFactory" Version="1.2.0" />
     <PackageReference Include="WPF-UI" Version="2.0.3" />
   </ItemGroup>
 

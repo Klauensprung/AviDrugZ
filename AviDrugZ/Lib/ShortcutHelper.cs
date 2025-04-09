@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using IWshRuntimeLibrary;
-using File = System.IO.File;
+using WindowsShortcutFactory;
 
 namespace AviDrugZ.Lib
 {
@@ -15,33 +14,24 @@ namespace AviDrugZ.Lib
                 string startMenuPath = Environment.GetFolderPath(Environment.SpecialFolder.StartMenu);
                 string shortcutPath = Path.Combine(startMenuPath, $"{appName}.lnk");
 
-                // Correct and reliable way to get the executable path
-                string executablePath = System.Diagnostics.Process.GetCurrentProcess().MainModule?.FileName;
-
+                string executablePath = GetExecutablePath();
                 if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
                     throw new FileNotFoundException("Executable path could not be resolved or does not exist.");
 
-                string iconPath = Path.Combine(Path.GetDirectoryName(executablePath), "Resources", "splash.ico");
+                string workingDirectory = Path.GetDirectoryName(executablePath);
+                string iconPath = Path.Combine(workingDirectory, "Resources", "splash.ico");
                 if (!File.Exists(iconPath))
                     iconPath = executablePath; // fallback to exe icon
 
-                var shell = new WshShell();
-                IWshShortcut shortcut;
-
-                if (File.Exists(shortcutPath))
+                using var shortcut = new WindowsShortcut
                 {
-                    shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
-                }
-                else
-                {
-                    shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
-                }
+                    Path = executablePath,
+                    WorkingDirectory = workingDirectory,
+                    IconLocation = iconPath,
+                    Description = description
+                };
 
-                shortcut.Description = description;
-                shortcut.TargetPath = executablePath;
-                shortcut.WorkingDirectory = Path.GetDirectoryName(executablePath);
-                shortcut.IconLocation = iconPath;
-                shortcut.Save();
+                shortcut.Save(shortcutPath);
             }
             catch (Exception ex)
             {
