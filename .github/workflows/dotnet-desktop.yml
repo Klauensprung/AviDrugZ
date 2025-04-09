@@ -1,0 +1,42 @@
+name: .NET Build and Release
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore ./AviDrugZ/AviDrugZ.csproj -r win-x64
+        
+      - name: Publish
+        run: dotnet publish ./AviDrugZ/AviDrugZ.csproj -c Release -r win-x64 --no-restore -o publish -p:DebugType=None -p:PublishSingleFile=true --self-contained true
+        
+      - name: Compress Published Files
+        shell: powershell
+        run: Compress-Archive -Path publish\* -DestinationPath Release.zip
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Release
+          path: Release.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: Release.zip
