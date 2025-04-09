@@ -19,7 +19,7 @@
 
 ### Get Started
 
-1. 📥 **Download the latest release [here](https://github.com/Klauensprung/AviDrugZ/releases/download/v2-0/AviDrugZ.v2.0.zip)**.
+1. 📥 **Download the latest release [here](https://github.com/Klauensprung/AviDrugZ/releases/latest/download/AviDrugZ-v2.1.zip)**.
 2. 📂 Extract the downloaded files.
 3. 🚀 Run `AviDrugZ.exe` to start searching and scanning for VRChat avatars.
 
