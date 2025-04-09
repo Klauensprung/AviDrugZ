@@ -1,4 +1,5 @@
 ﻿using aviDrug;
+using AviDrugZ.Lib;
 using AviDrugZ.Modules;
 using AviDrugZ.ViewModels;
 using System;
@@ -28,11 +29,15 @@ namespace AviDrugZ.Views
             InitializeComponent();
             this.DataContext = new LoginViewModel();
 
+            //we are loaded, add start menu entry
+            ShortcutHelper.CreateOrUpdateStartMenuShortcut("AviDrugZ","Scan or Search for Avatars");
+
             //just skip login for now until api login is fixed
             ((LoginViewModel)DataContext).SkipLogin();
             this.Close();
 
         }
+
 
         private void Login_Click(object sender, RoutedEventArgs e)
         {

@@ -340,7 +340,7 @@ namespace AviDrugZ.ViewModels
                                         
                                     } else
                                     {
-                                        avatarModels.Add(unknownModel);
+                                     //   avatarModels.Add(unknownModel);
                                         AvatarLogger.LogAvatarModel(unknownModel);
                                     }
 
@@ -627,24 +627,29 @@ namespace AviDrugZ.ViewModels
             }
         }
 
-        LiveScanner scanner;
+        //  LogScanner scanner = new LogScanner();
+        AvatarDiscoveryService scanner;
 
+        /// <summary>
+        /// Important live Scanner TODO: Add error handling
+        /// </summary>
         public void ScanCacheLive()
         {
             if (!liveScanning)
             {
                 AvatarModelsList = new ObservableCollection<AvatarModel>();
                 LiveScanning = true;
-                string cachePath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "Low\\VRChat\\VRChat\\Cache-WindowsPlayer";
-                scanner = new LiveScanner(cachePath);
+                scanner = new AvatarDiscoveryService();
+                scanner.Start();
 
                 scanner.Avatars.CollectionChanged += HandleAvatarCollectionChanged;
                 AvatarLogger.InitializeSession();
             }
             else
             {
-                //disable live scanning
-                scanner = null;
+                //unsubscribe from event
+                scanner.Stop();
+                scanner.Avatars.CollectionChanged -= HandleAvatarCollectionChanged;               
                 LiveScanning = false;
             }
         }
@@ -654,6 +659,9 @@ namespace AviDrugZ.ViewModels
         {
             if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
             {
+                //check if scanner is still existant before trying
+                if (scanner == null) return;
+
                 AvatarModel latestAvatar = scanner.Avatars.LastOrDefault();
                 if (latestAvatar == null) return;
 
@@ -688,8 +696,16 @@ namespace AviDrugZ.ViewModels
                 }
 
                 AvatarModel avatar = ConvertToAvatarModel(json);
-                avatar.DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation);
-                avatar.CacheLocation = cacheLocation;
+                if (String.IsNullOrEmpty(cacheLocation))
+                {
+                    avatar.DateDownloaded = DateTime.Today;
+                }
+                else
+                {
+                    avatar.DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation);
+                }
+
+                avatar.CacheLocation = "";
                 AvatarLogger.LogAvatarModel(avatar);
                 App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(avatar));
             }
@@ -697,19 +713,30 @@ namespace AviDrugZ.ViewModels
 
         private void AddUnknownModel(string avatarID, string cacheLocation)
         {
-            AvatarModel unknownModel = CreateUnknownAvatarModel(avatarID, cacheLocation);
+            AvatarModel unknownModel = null;
+
+            if (String.IsNullOrEmpty(cacheLocation))
+            {
+                unknownModel = CreateUnknownAvatarModel(avatarID);
+            }
+            else
+            {
+                unknownModel = CreateUnknownAvatarModel(avatarID, cacheLocation);
+            }
+
             var newModel = KlauenUtils.exportToVRCDB(avatarID);
+
             if (newModel != null)
             {
-                AvatarModel newDisplayModel = CreateDisplayModelFromNewModel(newModel, cacheLocation);
+                AvatarModel newDisplayModel = CreateDisplayModelFromNewModel(newModel);
                 App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(newDisplayModel));
                 AvatarLogger.LogAvatarModel(newDisplayModel);
                 AvatarsNew += 1;
             }
             else
             {
-                App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(unknownModel));
-                AvatarLogger.LogAvatarModel(unknownModel);
+            //    App.Current.Dispatcher.Invoke(() => AvatarModelsList.Add(unknownModel));
+            //    AvatarLogger.LogAvatarModel(unknownModel);
             }
         }
 
@@ -733,6 +760,21 @@ namespace AviDrugZ.ViewModels
             };
         }
 
+        private AvatarModel CreateUnknownAvatarModel(string avatarID)
+        {
+            return new AvatarModel
+            {
+                AvatarID = avatarID,
+                CacheLocation = "",
+                AuthorName = "Unknown",
+                AvatarName = "Unknown",
+                Description = avatarID,
+                DateAdded = DateTime.Now,
+                DateDownloaded = DateTime.Now,
+                IsPrivate = false
+            };
+        }
+
         private AvatarModel CreateDisplayModelFromNewModel(dynamic newModel, string cacheLocation)
         {
             return new AvatarModel
@@ -746,6 +788,22 @@ namespace AviDrugZ.ViewModels
                 QuestSupported = newModel.SupportedPlatforms == "3",
                 Version = newModel.UnityVersion,
                 DateDownloaded = System.IO.File.GetLastWriteTime(cacheLocation)
+            };
+        }
+
+        private AvatarModel CreateDisplayModelFromNewModel(dynamic newModel)
+        {
+            return new AvatarModel
+            {
+                AvatarID = newModel.Id,
+                AvatarName = newModel.Name,
+                AuthorName = newModel.AuthorName,
+                Description = newModel.Description,
+                ThumbnailUrl = newModel.ThumbnailImageUrl,
+                ImageUrl = newModel.ImageUrl,
+                QuestSupported = newModel.SupportedPlatforms == "3",
+                Version = newModel.UnityVersion,
+                DateDownloaded = DateTime.Now
             };
         }
 

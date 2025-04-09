@@ -55,6 +55,9 @@ namespace AviDrugZ
 
                     //parse to AvatarVRC
                     AvatarVRC avatarVRC = JsonConvert.DeserializeObject<AvatarVRC>(result);
+
+                    if (avatarVRC.ImageUrl == null) return null;
+
                     return avatarVRC;
 
                     if (result.EndsWith("Not Created.\"}"))
@@ -74,15 +77,6 @@ namespace AviDrugZ
                 Log.Error(e.Message);
                 return null;
             }
-
-
-
-
-
-
-
-
-
         }
 
         private static Regex alphanumeric = new Regex("^[a-zA-Z0-9\\-]*$");
